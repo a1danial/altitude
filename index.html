@@ -337,6 +337,26 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
     .lcard{max-width:280px}
     .linfo{grid-template-columns:repeat(2,1fr)}
   }
+
+  /* ============ STICKY COMPARE BAR ============ */
+  #compare-bar{
+    position:fixed;bottom:0;left:0;right:0;z-index:40;
+    background:linear-gradient(180deg,rgba(12,11,15,0.0),rgba(12,11,15,0.96) 28%);
+    backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);
+    padding:16px 28px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  }
+  #compare-bar.visible{transform:translateY(0)}
+  #compare-bar .cb-left{display:flex;align-items:center;gap:12px}
+  #compare-bar .cb-count{
+    width:30px;height:30px;border-radius:50%;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold));
+    color:#1a1408;font-weight:600;font-size:14px;display:grid;place-items:center;flex-shrink:0;
+  }
+  #compare-bar .cb-label{font-size:14px;color:var(--text-dim);font-weight:300}
+  #compare-bar .cb-label b{color:var(--text);font-weight:500}
 </style>
 </head>
 <body>
@@ -360,6 +380,14 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   <main class="wrap" id="view"></main>
 
   <footer class="site"><div class="wrap"><p>ALTITUDE · A curated concierge for premium travel cards · Illustrative product data for demonstration</p></div></footer>
+  
+  <div id="compare-bar">
+    <div class="cb-left">
+      <div class="cb-count" id="cb-count">0</div>
+      <div class="cb-label"><b id="cb-text">0 cards</b> added to compare</div>
+    </div>
+    <button class="btn btn-gold" data-action="goto-cart">Go to Compare <span class="arr">→</span></button>
+  </div>
 
 <script>
 /* ============================== ICONS ============================== */
@@ -536,9 +564,17 @@ function topPerks(n){
   const out=[]; for(const id of base){ if(!out.includes(id)) out.push(id); if(out.length===n) break; }
   return out.map(PERK);
 }
-const fmtRM = n => 'RM '+n.toLocaleString('en-MY');
+const fmtRM = n => n==null ? '' : n===0 ? 'Complimentary' : 'RM '+n.toLocaleString('en-MY');
 
 /* ============================== RENDER: NAV ============================== */
+function renderCompareBar(){
+  const n = state.cart.length;
+  const bar = document.getElementById('compare-bar');
+  bar.classList.toggle('visible', n > 0);
+  document.getElementById('cb-count').textContent = n;
+  document.getElementById('cb-text').textContent = n+' card'+(n===1?'':'s');
+}
+
 function renderNav(){
   const steps=[
     {id:'profile',num:'01',label:'Profile'},
@@ -848,6 +884,7 @@ function renderMap(){
 /* ============================== ROUTER ============================== */
 function render(){
   renderNav();
+  renderCompareBar();
   const v=document.getElementById('view');
   if(state.page==='profile') v.innerHTML=renderProfile();
   else if(state.page==='cart') v.innerHTML=renderCart();
