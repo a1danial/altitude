@@ -657,7 +657,7 @@ function renderCart(){
     </tr>
     <tr>
       <th class="col-feat fcell"><div class="fname"><span class="fi">${svgIcon('protection')}</span>Annual Fee</div></th>
-      ${cols.map(c=>`<td><div class="req-val">${fmtRM(c.fee)}</div><div class="req-sub waiv">${(c.waiver||'').replace(/\n/g,'<br>')}</div></td>`).join('')}
+      ${cols.map(c=>`<td><div class="req-val">${fmtRM(c.fee)}</div>${c.waiver?`<div class="req-sub waiv">${c.waiver.replace(/\n/g,'<br>')}</div>`:''}</td>`).join('')}
     </tr>`;
 
   const perkRows = `
@@ -752,7 +752,7 @@ function renderListing(){
         </div>
         <div>
           <div class="fi-lab">${svgIcon('protection')} Annual Fee</div>
-          <div class="fi-val big">${fmtRM(c.fee)}<span class="waiv">${(c.waiver||'').replace(/\n/g,'<br>')}</span></div>
+          <div class="fi-val big">${fmtRM(c.fee)}${c.waiver?`<span class="waiv">${c.waiver.replace(/\n/g,'<br>')}</span>`:''}</div>
         </div>
         ${perkCols}
       </div>
