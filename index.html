@@ -447,13 +447,25 @@ async function loadData(){
           lounges:   f.lounge_lounges   ||null
         };
       }
-      /* flat perk columns */
-      ['insurance','overseas','miles','transfer','fasttrack','hotel','golf',
-       'concierge','roaming','businessclass','wifi','protection'].forEach(k=>{
-        perks[k] = f[k]||null;
-      });
+      /* flat perk columns — note: overseas imported as "overseas+" in Airtable */
+      perks.insurance    = f['insurance']     ||null;
+      perks.overseas     = f['overseas']||f['overseas+']||null;
+      perks.miles        = f['miles']         ||null;
+      perks.transfer     = f['transfer']      ||null;
+      perks.fasttrack    = f['fasttrack']     ||null;
+      perks.hotel        = f['hotel']         ||null;
+      perks.golf         = f['golf']          ||null;
+      perks.concierge    = f['concierge']     ||null;
+      perks.roaming      = f['roaming']       ||null;
+      perks.businessclass= f['businessclass'] ||null;
+      perks.wifi         = f['wifi']          ||null;
+      perks.protection   = f['protection']    ||null;
+
+      /* derive a slug id from the name since Airtable uses its own id field */
+      const slugId = (f.name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+$/,'');
+
       return {
-        id:        f.id,
+        id:        slugId,
         name:      f.name,
         tier:      f.tier,
         net:       f.net,
