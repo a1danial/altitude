@@ -86,7 +86,7 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .nav-toggle{display:none}
 
   /* ============ SHARED ============ */
-  .page{animation:fade .5s ease both;padding-bottom:80px}
+  .page{animation:fade var(--anim-dur,.5s) ease both;padding-bottom:80px}
   @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .eyebrow{font-size:12px;letter-spacing:0.34em;text-transform:uppercase;color:var(--gold);font-weight:500}
   h1.title{font-family:'Fraunces',serif;font-weight:400;font-size:clamp(34px,5vw,58px);line-height:1.04;letter-spacing:-0.01em;margin:14px 0 0}
@@ -115,7 +115,7 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .perk{
     position:relative;background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);
     padding:20px 20px 20px 20px;cursor:pointer;transition:.22s;overflow:hidden;
-    animation:rise .5s ease both;
+    animation:rise var(--anim-dur,.5s) ease both;
   }
   @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   .perk:hover{border-color:var(--gold);background:var(--surface-2);transform:translateY(-3px)}
@@ -218,7 +218,7 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .lrow{
     display:grid;grid-template-columns:260px 1fr auto;gap:28px;align-items:center;
     background:var(--surface);border:1px solid var(--line-soft);border-radius:18px;padding:22px;transition:.25s;
-    animation:rise .5s ease both;
+    animation:rise var(--anim-dur,.5s) ease both;
   }
   .lrow:hover{border-color:var(--line);background:var(--surface-2)}
   .lcard{
@@ -880,14 +880,19 @@ function renderMap(){
 }
 
 /* ============================== ROUTER ============================== */
+let _lastPage = null;
 function render(scrollTop=false){
+  const samePageRender = _lastPage === state.page;
+  _lastPage = state.page;
   renderNav();
   renderStickyBar();
   const v=document.getElementById('view');
+  if(samePageRender) v.style.setProperty('--anim-dur','0s');
   if(state.page==='profile') v.innerHTML=renderProfile();
   else if(state.page==='cart') v.innerHTML=renderCart();
   else if(state.page==='map') v.innerHTML=renderMap();
   else v.innerHTML=renderListing();
+  if(samePageRender) requestAnimationFrame(()=>v.style.removeProperty('--anim-dur'));
   if(scrollTop) window.scrollTo({top:0,behavior:'instant'in document.documentElement.style?'instant':'auto'});
 }
 
