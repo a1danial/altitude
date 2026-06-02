@@ -338,25 +338,24 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
     .linfo{grid-template-columns:repeat(2,1fr)}
   }
 
-  /* ============ STICKY COMPARE BAR ============ */
-  #compare-bar{
+  /* ============ STICKY BAR ============ */
+  #sticky-bar{
     position:fixed;bottom:0;left:0;right:0;z-index:40;
-    background:linear-gradient(180deg,rgba(12,11,15,0.0),rgba(12,11,15,0.96) 28%);
-    backdrop-filter:blur(14px);
+    background:rgba(12,11,15,0.92);
+    backdrop-filter:blur(18px);
     border-top:1px solid var(--line);
-    padding:16px 28px 20px;
+    padding:14px 28px 18px;
     display:flex;align-items:center;justify-content:space-between;gap:16px;
-    transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
   }
-  #compare-bar.visible{transform:translateY(0)}
-  #compare-bar .cb-left{display:flex;align-items:center;gap:12px}
-  #compare-bar .cb-count{
-    width:30px;height:30px;border-radius:50%;
+  #sticky-bar .sb-left{display:flex;align-items:center;gap:12px}
+  #sticky-bar .sb-count{
+    width:28px;height:28px;border-radius:50%;
     background:linear-gradient(180deg,var(--gold-bright),var(--gold));
-    color:#1a1408;font-weight:600;font-size:14px;display:grid;place-items:center;flex-shrink:0;
+    color:#1a1408;font-weight:600;font-size:13px;display:grid;place-items:center;flex-shrink:0;
   }
-  #compare-bar .cb-label{font-size:14px;color:var(--text-dim);font-weight:300}
-  #compare-bar .cb-label b{color:var(--text);font-weight:500}
+  #sticky-bar .sb-label{font-size:13.5px;color:var(--text-dim);font-weight:300}
+  #sticky-bar .sb-label b{color:var(--text);font-weight:500}
+  @media(max-width:680px){#sticky-bar{padding:12px 18px 16px}}
 </style>
 </head>
 <body>
@@ -381,12 +380,9 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
 
   <footer class="site"><div class="wrap"><p>ALTITUDE · A curated concierge for premium travel cards · Illustrative product data for demonstration</p></div></footer>
   
-  <div id="compare-bar">
-    <div class="cb-left">
-      <div class="cb-count" id="cb-count">0</div>
-      <div class="cb-label"><b id="cb-text">0 cards</b> added to compare</div>
-    </div>
-    <button class="btn btn-gold" data-action="goto-cart">Go to Compare <span class="arr">→</span></button>
+  <div id="sticky-bar">
+    <div class="sb-left" id="sb-left"></div>
+    <div id="sb-btn"></div>
   </div>
 
 <script>
@@ -567,12 +563,26 @@ function topPerks(n){
 const fmtRM = n => n==null ? '' : n===0 ? 'Complimentary' : 'RM '+n.toLocaleString('en-MY');
 
 /* ============================== RENDER: NAV ============================== */
-function renderCompareBar(){
+function renderStickyBar(){
   const n = state.cart.length;
-  const bar = document.getElementById('compare-bar');
-  bar.classList.toggle('visible', n > 0);
-  document.getElementById('cb-count').textContent = n;
-  document.getElementById('cb-text').textContent = n+' card'+(n===1?'':'s');
+  const p = state.page;
+  const left = document.getElementById('sb-left');
+  const btn = document.getElementById('sb-btn');
+  if(p==='listing'){
+    left.innerHTML = n>0
+      ? `<div class="sb-count">${n}</div><div class="sb-label"><b>${n} card${n===1?'':'s'}</b> added to compare</div>`
+      : '';
+    btn.innerHTML = `<button class="btn btn-gold" data-action="goto-cart">Go to Compare <span class="arr">→</span></button>`;
+  } else if(p==='profile'){
+    left.innerHTML = '';
+    btn.innerHTML = `<button class="btn btn-gold" data-action="goto-listing">Browse the cards <span class="arr">→</span></button>`;
+  } else if(p==='cart'){
+    left.innerHTML = '';
+    btn.innerHTML = `<button class="btn btn-ghost" data-action="goto-listing">Browse the cards <span class="arr">→</span></button>`;
+  } else {
+    left.innerHTML = '';
+    btn.innerHTML = '';
+  }
 }
 
 function renderNav(){
@@ -640,10 +650,6 @@ function renderProfile(){
     <div class="profile-grid ${hasSide?'has-side':''}">
       <div class="perks">${perkCards}</div>
       ${side}
-    </div>
-    <div class="page-foot">
-      <div class="fmeta">${hasSide?`<b>${state.selected.length}</b> perk${state.selected.length>1?'s':''} prioritised — ready to compare.`:'Select at least one perk to build your priority list.'}</div>
-      <button class="btn btn-gold" data-action="goto-listing">Browse the cards <span class="arr">→</span></button>
     </div>
   </div>`;
 }
@@ -729,10 +735,6 @@ function renderCart(){
       <p class="lede">${cols.length} card${cols.length>1?'s':''} shortlisted. ${tailored?'Perks are ordered by your priorities from the Profile Builder.':'Perks follow the standard order — set priorities in the Profile Builder to re-sort.'}</p>
     </div>
     <div class="cmp-scroll"><table class="cmp">${head}<tbody>${reqRows}${perkRows}</tbody></table></div>
-    <div class="page-foot">
-      <div class="fmeta">Want different cards? <b>Adjust your shortlist</b> from the Card Index.</div>
-      <button class="btn btn-ghost" data-action="goto-listing">Back to all cards <span class="arr">→</span></button>
-    </div>
   </div>`;
 }
 
@@ -812,10 +814,6 @@ function renderListing(){
         : `Showing default perks: <b>${top.map(p=>p.name).join(' · ')}</b> — set priorities to personalise`}</div>
     </div>
     <div class="list">${rows}</div>
-    <div class="page-foot">
-      <div class="fmeta">${state.cart.length?`<b>${state.cart.length}</b> card${state.cart.length>1?'s':''} in your comparison.`:'Add cards above to build your comparison.'}</div>
-      <button class="btn ${state.cart.length?'btn-gold':'btn-ghost'}" data-action="goto-cart">Go to Compare <span class="arr">→</span></button>
-    </div>
   </div>`;
 }
 
@@ -882,15 +880,15 @@ function renderMap(){
 }
 
 /* ============================== ROUTER ============================== */
-function render(){
+function render(scrollTop=false){
   renderNav();
-  renderCompareBar();
+  renderStickyBar();
   const v=document.getElementById('view');
   if(state.page==='profile') v.innerHTML=renderProfile();
   else if(state.page==='cart') v.innerHTML=renderCart();
   else if(state.page==='map') v.innerHTML=renderMap();
   else v.innerHTML=renderListing();
-  window.scrollTo({top:0,behavior:'instant'in document.documentElement.style?'instant':'auto'});
+  if(scrollTop) window.scrollTo({top:0,behavior:'instant'in document.documentElement.style?'instant':'auto'});
 }
 
 /* ============================== EVENTS ============================== */
@@ -900,9 +898,9 @@ document.addEventListener('click', e=>{
   const a=t.dataset.action, id=t.dataset.perk, cid=t.dataset.card;
 
   switch(a){
-    case 'nav-profile': state.page='profile'; render(); break;
-    case 'nav-cart': case 'goto-cart': state.page='cart'; render(); break;
-    case 'nav-listing': case 'goto-listing': state.page='listing'; render(); break;
+    ase 'nav-profile': state.page='profile'; render(true); break;
+    case 'nav-cart': case 'goto-cart': state.page='cart'; render(true); break;
+    case 'nav-listing': case 'goto-listing': state.page='listing'; render(true); break;
 
     case 'toggle-perk':{
       const i=state.selected.indexOf(id);
@@ -960,16 +958,16 @@ document.addEventListener('click', e=>{
     case 'open-map':
       state.mapReturn='cart'; state.mapCard=null; state.mapRegion='all'; state.page='map';
       posthog.capture('lounge_map_opened',{source:'compare_table'});
-      render(); break;
+      render(true); break;
     case 'open-map-card':
       state.mapReturn='listing'; state.mapCard=cid; state.mapRegion='all'; state.page='map';
       posthog.capture('lounge_map_opened',{source:'card_listing',card_id:cid,card_name:CARD(cid)?.name});
-      render(); break;
+      render(true); break;
     case 'map-region':
       state.mapRegion=t.dataset.region;
       posthog.capture('lounge_region_filtered',{region:t.dataset.region});
       render(); break;
-    case 'map-back': state.page=state.mapReturn||'listing'; render(); break;
+    case 'map-back': state.page=state.mapReturn||'listing'; render(true); break;
   }
 });
 
