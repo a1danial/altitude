@@ -1006,6 +1006,9 @@ function renderListing(){
       else if(p.id==='lounge'){
         valHtml=`<div class="fi-val">${v.visits}<span class="waiv" style="color:var(--text-faint)">${v.access}</span></div>
           <button class="map-mini" data-action="open-map-card" data-card="${c.id}">${svgIcon('overseas')} Lounge map</button>`;
+      } else if(p.id==='insurance'){
+        const summary = v.accident || 'Personal accident cover';
+        valHtml=`<div class="fi-val">${summary}</div>`;
       } else { valHtml=`<div class="fi-val">${v}</div>`; }
       return `<div><div class="fi-lab">${svgIcon(p.id)} ${p.name}</div>${valHtml}</div>`;
     }).join('');
@@ -1022,7 +1025,9 @@ function renderListing(){
             <button class="map-mini" data-action="open-map-card" data-card="${c.id}">${svgIcon('overseas')} Lounge map</button>
           </span></div>`;
         }
-        return `<div class="ei2 ${v?'':'off'}"><span class="d"></span><span class="t"><span class="n">${p.name}</span>${v?`<span class="v">${v}</span>`:`<span class="v">Not included</span>`}</span></div>`;
+        return `<div class="ei2 ${v?'':'off'}"><span class="d"></span><span class="t"><span class="n">${p.name}</span>${v
+          ? `<span class="v">${p.id==='insurance' ? (v.accident||'Personal accident cover') : v}</span>`
+          : `<span class="v">Not included</span>`}</span></div>`;
       }).join('')}
     </div>` : '';
 
