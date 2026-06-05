@@ -194,7 +194,11 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .fname.prio .fi{background:var(--gold);color:#1a1408;border-color:var(--gold)}
   .fname .prn-mini{width:21px;height:21px;border-radius:50%;background:var(--gold);color:#1a1408;font-size:11px;font-weight:600;display:grid;place-items:center;flex-shrink:0}
   .col-feat.fcell{padding-left:3px;padding-right:18px}
-  tr.prio-row td:not(.col-feat){background:rgba(201,169,106,0.045)}
+  tr.prio-row td, tr.prio-row th.col-feat{background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06))}
+  tr.prio-row th.col-feat .fname.prio{background:transparent;box-shadow:none;border-color:transparent}
+  tr.prio-row td .cell-yes .ck{color:var(--gold-bright)}
+  tr.prio-row td .cell-yes .det{color:rgba(236,231,221,0.8)}
+  tr.prio-row td .cell-no{color:rgba(201,169,106,0.3)}
   .cell-yes{color:var(--text)}
   .cell-yes .ck{display:inline-flex;align-items:center;gap:7px;color:var(--gold);font-weight:500;font-size:13px;margin-bottom:3px}
   .cell-yes .ck svg{width:14px;height:14px}
@@ -260,6 +264,40 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .lounge-det .ld{display:flex;gap:9px;line-height:1.35}
   .lounge-det .lk{color:var(--gold);font-weight:500;min-width:58px;flex-shrink:0;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;padding-top:2px}
   .lounge-det .lv{color:var(--text-dim);font-weight:300;font-size:12.5px}
+
+  /* ── SUB-ROWS for lounge + insurance detail ── */
+  tr.prio-sub td, tr.prio-sub th,
+  tr.prio-sub-last td, tr.prio-sub-last th{
+    background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06));
+    border-top:none !important;
+    padding:6px 14px 6px !important;
+    vertical-align:top !important;
+    font-weight:normal;
+    position:relative;
+  }
+  tr.prio-sub-last td, tr.prio-sub-last th{padding-bottom:14px !important}
+  tr.prio-sub-first td, tr.prio-sub-first th{border-top:none !important}
+  tr.prio-row.has-sub td, tr.prio-row.has-sub th{padding-bottom:2px}
+  /* Divider on value columns only, not feature column, skipping first sub-row */
+  tr.prio-sub:not(.prio-sub-first) td:not(.col-feat),
+  tr.prio-sub-last td:not(.col-feat){
+    border-top:1px solid rgba(201,169,106,0.18) !important;
+    padding-top:5px !important;
+  }
+  /* Sub-label in feature column */
+  .sub-label{
+    font-size:10px;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--gold);font-weight:500;
+    display:block;text-align:right;
+    padding:4px 8px 0 0;margin:0;line-height:1.45;
+  }
+  .sub-label.uw{color:var(--text-faint);font-weight:400}
+  /* Sub-value in card columns */
+  .sv{font-size:13px;color:var(--text-dim);font-weight:300;line-height:1.45;padding:0;margin:0;display:block}
+  .sv.na{color:var(--text-faint);font-style:italic}
+  .sv.uw{font-size:11.5px;color:var(--text-faint);font-weight:300}
+  .sv-bullet{display:flex;align-items:baseline;gap:6px;font-size:13px;color:var(--text-dim);font-weight:300;line-height:1.45}
+  .sv-bullet::before{content:"·";color:var(--gold);font-weight:700;flex-shrink:0}
 
   /* wide lounge-map CTA inside compare table */
   .map-cta-row td{padding:18px 0 6px;border-top:none}
@@ -437,27 +475,27 @@ const STATIC_CARDS = [
   {id:'aurora', name:'Aurora Infinite', tier:'Invitation Only', net:'World Elite', num:'•••• 0001',
    theme:'linear-gradient(135deg,#1c1812 0%,#3a2f17 45%,#0c0a07 100%)', fg:'#ecdcb4',
    minSalary:600000, fee:3180, waiver:'By invitation — non-waivable',
-   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 1 supplementary + unlimited guests',condition:null,lounges:'1,300+ lounges worldwide · Priority Pass Select'},insurance:'Up to RM 5,000,000 cover',overseas:'5% cashback, all currencies',miles:'2.0 miles per RM 1',transfer:'8 limousine transfers / year',fasttrack:'Priority lanes at 30+ airports',hotel:'Marriott & Hilton elite status',golf:'Unlimited green fees',concierge:'Dedicated lifestyle manager',roaming:'Unlimited data, 100+ countries',businessclass:'Up to 35% off business class',wifi:'Full in-flight WiFi credit',protection:'180-day purchase protection'}},
+   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 1 supplementary + unlimited guests',condition:null,lounges:'1,300+ lounges worldwide · Priority Pass Select'},insurance:{inconveniences:'Trip cancellation up to RM 50,000\nTrip delay up to RM 5,000 · min. 6-hour delay',medical:'Up to RM 1,000,000 overseas medical & hospitalisation',accident:'Up to RM 5,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'AIG Malaysia Insurance Berhad'},overseas:'5% cashback, all currencies',miles:'2.0 miles per RM 1',transfer:'8 limousine transfers / year',fasttrack:'Priority lanes at 30+ airports',hotel:'Marriott & Hilton elite status',golf:'Unlimited green fees',concierge:'Dedicated lifestyle manager',roaming:'Unlimited data, 100+ countries',businessclass:'Up to 35% off business class',wifi:'Full in-flight WiFi credit',protection:'180-day purchase protection'}},
   {id:'meridian', name:'Meridian Reserve', tier:'Reserve', net:'World Elite', num:'•••• 1875',
    theme:'linear-gradient(135deg,#0e1a16 0%,#163a31 50%,#08110e 100%)', fg:'#cfe6da',
    minSalary:300000, fee:1500, waiver:'Waived with RM 150,000 annual spend',
-   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 1 guest',condition:null,lounges:'1,300+ lounges · Priority Pass'},insurance:'Up to RM 2,000,000 cover',overseas:'3% cashback, all currencies',miles:'1.5 miles per RM 1',transfer:'4 limousine transfers / year',fasttrack:'Priority lanes, select airports',hotel:'Hilton Honors Gold status',golf:'12 green fees / year',concierge:'24/7 concierge desk',roaming:null,businessclass:'Up to 20% off business class',wifi:'RM 200 WiFi credit / year',protection:'90-day purchase protection'}},
+   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 1 guest',condition:null,lounges:'1,300+ lounges · Priority Pass'},insurance:{inconveniences:'Trip cancellation up to RM 30,000\nTrip delay up to RM 3,000 · min. 6-hour delay',medical:'Up to RM 500,000 overseas medical & hospitalisation',accident:'Up to RM 2,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'Chubb Insurance Malaysia Berhad'},overseas:'3% cashback, all currencies',miles:'1.5 miles per RM 1',transfer:'4 limousine transfers / year',fasttrack:'Priority lanes, select airports',hotel:'Hilton Honors Gold status',golf:'12 green fees / year',concierge:'24/7 concierge desk',roaming:null,businessclass:'Up to 20% off business class',wifi:'RM 200 WiFi credit / year',protection:'90-day purchase protection'}},
   {id:'horizon', name:'Horizon World Elite', tier:'World Elite', net:'World Elite', num:'•••• 4421',
    theme:'linear-gradient(135deg,#0c1320 0%,#1d2c47 50%,#080d16 100%)', fg:'#cdd9ee',
    minSalary:200000, fee:1080, waiver:'Waived with RM 100,000 annual spend',
-   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 2 guests',condition:'Min. RM 6,000 spend in each qualifying quarter',lounges:'1,300+ lounges · Priority Pass'},insurance:'Up to RM 2,000,000 cover',overseas:'2.5% cashback, all currencies',miles:'1.5 miles per RM 1',transfer:'2 limousine transfers / year',fasttrack:'Fast-track at KLIA',hotel:'Accor Plus membership',golf:'8 green fees / year',concierge:'24/7 concierge desk',roaming:'Unlimited data, 50 countries',businessclass:'Up to 15% off premium fares',wifi:'RM 150 WiFi credit / year',protection:'90-day purchase protection'}},
+   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 2 guests',condition:'Min. RM 6,000 spend in each qualifying quarter',lounges:'1,300+ lounges · Priority Pass'},insurance:{inconveniences:'Trip cancellation up to RM 20,000\nTrip delay up to RM 2,000 · min. 6-hour delay',medical:'Up to RM 500,000 overseas medical & hospitalisation',accident:'Up to RM 2,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'Chubb Insurance Malaysia Berhad'},overseas:'2.5% cashback, all currencies',miles:'1.5 miles per RM 1',transfer:'2 limousine transfers / year',fasttrack:'Fast-track at KLIA',hotel:'Accor Plus membership',golf:'8 green fees / year',concierge:'24/7 concierge desk',roaming:'Unlimited data, 50 countries',businessclass:'Up to 15% off premium fares',wifi:'RM 150 WiFi credit / year',protection:'90-day purchase protection'}},
   {id:'solstice', name:'Solstice Platinum', tier:'Platinum', net:'Signature', num:'•••• 6630',
    theme:'linear-gradient(135deg,#1d1d20 0%,#3c3c43 50%,#141416 100%)', fg:'#e3e3e8',
    minSalary:150000, fee:800, waiver:'Waived with RM 80,000 annual spend',
-   perks:{lounge:{visits:'6 visits / year',access:'Cardholder only',condition:'Min. RM 500 single or cumulative spend within 30 days before / after lounge entry',lounges:'25 Plaza Premium Lounges · Asia-Pacific'},insurance:'Up to RM 1,000,000 cover',overseas:'2% cashback, all currencies',miles:'1.2 miles per RM 1',transfer:'2 airport transfers / year',fasttrack:null,hotel:null,golf:'6 green fees / year',concierge:'24/7 concierge desk',roaming:null,businessclass:null,wifi:null,protection:'90-day purchase protection'}},
+   perks:{lounge:{visits:'6 visits / year',access:'Cardholder only',condition:'Min. RM 500 single or cumulative spend within 30 days before / after lounge entry',lounges:'25 Plaza Premium Lounges · Asia-Pacific'},insurance:{inconveniences:null,medical:null,accident:'Up to RM 1,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'N/A — confirm with issuer'},overseas:'2% cashback, all currencies',miles:'1.2 miles per RM 1',transfer:'2 airport transfers / year',fasttrack:null,hotel:null,golf:'6 green fees / year',concierge:'24/7 concierge desk',roaming:null,businessclass:null,wifi:null,protection:'90-day purchase protection'}},
   {id:'voyager', name:'Voyager Signature', tier:'Signature', net:'Signature', num:'•••• 2208',
    theme:'linear-gradient(135deg,#241712 0%,#4c3120 50%,#150d08 100%)', fg:'#ecd6bf',
    minSalary:120000, fee:600, waiver:'Waived with RM 60,000 annual spend',
-   perks:{lounge:{visits:'4 visits / year',access:'Cardholder + 1 guest (shared quota)',condition:null,lounges:'Plaza Premium Lounges · Malaysia'},insurance:'Up to RM 1,000,000 cover',overseas:'1.5% cashback, all currencies',miles:'1.0 mile per RM 1',transfer:null,fasttrack:null,hotel:null,golf:null,concierge:'Travel concierge desk',roaming:'RM 50 roaming credit / trip',businessclass:null,wifi:null,protection:'60-day purchase protection'}},
+   perks:{lounge:{visits:'4 visits / year',access:'Cardholder + 1 guest (shared quota)',condition:null,lounges:'Plaza Premium Lounges · Malaysia'},insurance:{inconveniences:null,medical:null,accident:'Up to RM 1,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'N/A — confirm with issuer'},overseas:'1.5% cashback, all currencies',miles:'1.0 mile per RM 1',transfer:null,fasttrack:null,hotel:null,golf:null,concierge:'Travel concierge desk',roaming:'RM 50 roaming credit / trip',businessclass:null,wifi:null,protection:'60-day purchase protection'}},
   {id:'equator', name:'Equator Gold', tier:'Gold', net:'Gold', num:'•••• 9914',
    theme:'linear-gradient(135deg,#2a2114 0%,#5e4824 50%,#1a1409 100%)', fg:'#f0dcb0',
    minSalary:60000, fee:240, waiver:'Waived with RM 30,000 annual spend',
-   perks:{lounge:{visits:'2 visits / year',access:'Cardholder only',condition:'Min. RM 3,000 spend in the preceding calendar month',lounges:'Plaza Premium Lounge · KLIA & KLIA2'},insurance:'Up to RM 500,000 cover',overseas:'1% cashback, all currencies',miles:'0.8 miles per RM 1',transfer:null,fasttrack:null,hotel:null,golf:null,concierge:null,roaming:null,businessclass:null,wifi:null,protection:'60-day purchase protection'}}
+   perks:{lounge:{visits:'2 visits / year',access:'Cardholder only',condition:'Min. RM 3,000 spend in the preceding calendar month',lounges:'Plaza Premium Lounge · KLIA & KLIA2'},insurance:{inconveniences:null,medical:null,accident:'Up to RM 500,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'N/A — confirm with issuer'},overseas:'1% cashback, all currencies',miles:'0.8 miles per RM 1',transfer:null,fasttrack:null,hotel:null,golf:null,concierge:null,roaming:null,businessclass:null,wifi:null,protection:'60-day purchase protection'}}
 ];
 
 const STATIC_LOUNGES = [
@@ -612,19 +650,52 @@ async function loadData(){
 }
 
 /* compare-table cell renderer (lounge gets structured detail) */
+/* Sub-row fields for lounge and insurance */
+const LOUNGE_FIELDS = [
+  {key:'visits',    label:'Visits'},
+  {key:'access',    label:'Access'},
+  {key:'lounges',   label:'Network'},
+  {key:'condition', label:'Condition'},
+];
+const INS_FIELDS = [
+  {key:'inconveniences', label:'Travel Disruptions', uw:false},
+  {key:'medical',        label:'Medical',            uw:false},
+  {key:'accident',       label:'Accident',           uw:false},
+  {key:'activation',     label:'Condition',          uw:false},
+  {key:'underwriter',    label:'Underwriter',        uw:true},
+];
+
 function cmpCell(c,p){
   const v=c.perks[p.id];
   if(!v) return `<td><span class="cell-no">—</span></td>`;
   if(p.id==='lounge'){
-    return `<td><div class="cell-yes"><span class="ck">${CHECK} Included</span>
-      <span class="lounge-det">
-        <span class="ld"><span class="lk">Visits</span><span class="lv">${v.visits}</span></span>
-        <span class="ld"><span class="lk">Access</span><span class="lv">${v.access}</span></span>
-        <span class="ld"><span class="lk">Lounges</span><span class="lv">${v.lounges}</span></span>
-        <span class="ld"><span class="lk">Condition</span><span class="lv">${v.condition||'No spend condition'}</span></span>
-      </span></div></td>`;
+    return `<td><div class="cell-yes"><span class="ck">${CHECK} Included</span></div></td>`;
   }
-  return `<td><div class="cell-yes"><span class="ck">${CHECK} Included</span><span class="det">${v}</span></div></td>`;
+  if(p.id==='insurance'){
+    return `<td><div class="cell-yes"><span class="ck">${CHECK} Included</span></div></td>`;
+  }
+  return `<td><div class="cell-yes"><span class="ck">${CHECK} Included</span><div class="det">${v}</div></div></td>`;
+}
+
+/* Generate sub-rows for a priority perk (lounge or insurance) */
+function subRows(fields, dataKey, cols){
+  return fields.map((f,i) => {
+    const isFirst = i===0;
+    const isLast  = i===fields.length-1;
+    const cls = isFirst ? 'prio-sub prio-sub-first' : (isLast ? 'prio-sub-last' : 'prio-sub');
+    return `<tr class="${cls}">
+      <td class="col-feat fcell"><span class="sub-label${f.uw?' uw':''}">${f.label}</span></td>
+      ${cols.map(c=>{
+        const obj = c.perks[dataKey];
+        const v = obj ? obj[f.key] : null;
+        if(f.key==='inconveniences' && v){
+          const bullets = v.split('\n').map(l=>`<span class="sv-bullet">${l}</span>`).join('');
+          return `<td><span class="sv">${bullets}</span></td>`;
+        }
+        return `<td><span class="sv${!v?' na':''}${f.uw?' uw':''}">${v||(f.key==='lounges'?'—':'Not covered')}</span></td>`;
+      }).join('')}
+    </tr>`;
+  }).join('');
 }
 
 /* ============================== STATE ============================== */
@@ -798,13 +869,38 @@ function renderCart(){
         ${cols.map(c=>cmpCell(c,p)).join('')}
       </tr>`;
       if(p.id==='lounge'){
-        return row + `<tr class="map-cta-row"><td colspan="${cols.length+1}">
-          <button class="map-cta" data-action="open-map">
-            <span class="mc-ico">${svgIcon('overseas')}</span>
-            <span class="mc-txt"><b>Explore the Lounge Access Map</b><span>See every partner lounge across the global network — by airport and region.</span></span>
-            <span class="arr">→</span>
-          </button>
-        </td></tr>`;
+        const mainRow = `<tr class="${pr>-1?'prio-row has-sub':''}">
+          <th class="col-feat fcell">
+            <div class="fname ${pr>-1?'prio':''}">
+              <span class="fi">${svgIcon(p.id)}</span>
+              <span class="fn-name">${p.name}</span>
+              ${pr>-1?`<span class="prn-mini">${pr+1}</span>`:''}
+            </div>
+          </th>
+          ${cols.map(c=>cmpCell(c,p)).join('')}
+        </tr>`;
+        return mainRow
+          + subRows(LOUNGE_FIELDS,'lounge',cols)
+          + `<tr class="map-cta-row ${pr>-1?'prio-cta-row':''}"><td colspan="${cols.length+1}" style="padding-top:0;border-top:none;${pr>-1?'background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06))':''}">
+            <button class="map-cta" data-action="open-map">
+              <span class="mc-ico">${svgIcon('lounge')}</span>
+              <span class="mc-txt"><b>Explore the Lounge Access Map</b><span>See every partner lounge across the global network — by airport and region.</span></span>
+              <span class="arr">→</span>
+            </button>
+          </td></tr>`;
+      }
+      if(p.id==='insurance'){
+        const mainRow = `<tr class="${pr>-1?'prio-row has-sub':''}">
+          <th class="col-feat fcell">
+            <div class="fname ${pr>-1?'prio':''}">
+              <span class="fi">${svgIcon(p.id)}</span>
+              <span class="fn-name">${p.name}</span>
+              ${pr>-1?`<span class="prn-mini">${pr+1}</span>`:''}
+            </div>
+          </th>
+          ${cols.map(c=>cmpCell(c,p)).join('')}
+        </tr>`;
+        return mainRow + subRows(INS_FIELDS,'insurance',cols);
       }
       return row;
     }).join('')}`;
