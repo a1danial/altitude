@@ -295,15 +295,17 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
     background:var(--surface);
   }
   /* Divider on value columns only, skipping first sub-row */
-  tr.prio-sub:not(.prio-sub-first) td:not(.col-feat),
-  tr.prio-sub-last td:not(.col-feat){
+  /* Priority: gold divider */
+  tr.prio-sub:not(.prio-sub-first).is-prio td:not(.col-feat),
+  tr.prio-sub-last.is-prio td:not(.col-feat){
     border-top:1px solid rgba(201,169,106,0.18) !important;
     padding-top:5px !important;
   }
-  /* Non-priority divider is softer */
+  /* Non-priority: soft divider */
   tr.prio-sub:not(.prio-sub-first):not(.is-prio) td:not(.col-feat),
   tr.prio-sub-last:not(.is-prio) td:not(.col-feat){
     border-top:1px solid var(--line-soft) !important;
+    padding-top:5px !important;
   }
   /* Sub-label in feature column */
   .sub-label{
@@ -320,6 +322,10 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .sv{font-size:13px;color:var(--text-dim);font-weight:300;line-height:1.45;padding:0;margin:0;display:block}
   .sv.na{color:var(--text-faint);font-style:italic}
   .sv.uw{font-size:11.5px;color:var(--text-faint);font-weight:300}
+  /* Priority rows — match tr.prio-row td .cell-yes .det warm white */
+  tr.is-prio .sv{color:rgba(236,231,221,0.85)}
+  tr.is-prio .sv.na{color:rgba(201,169,106,0.35)}
+  tr.is-prio .sv.uw{color:rgba(201,169,106,0.45);font-size:11.5px}
   .sv-bullet{display:flex;align-items:baseline;gap:6px;font-size:13px;color:var(--text-dim);font-weight:300;line-height:1.45}
   .sv-bullet::before{content:"·";color:var(--gold);font-weight:700;flex-shrink:0}
 
