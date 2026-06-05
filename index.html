@@ -268,7 +268,6 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   /* ── SUB-ROWS for lounge + insurance detail ── */
   tr.prio-sub td, tr.prio-sub th,
   tr.prio-sub-last td, tr.prio-sub-last th{
-    background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06));
     border-top:none !important;
     padding:6px 14px 6px !important;
     vertical-align:top !important;
@@ -276,13 +275,27 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
     position:relative;
   }
   tr.prio-sub-last td, tr.prio-sub-last th{padding-bottom:14px !important}
-  tr.prio-sub-first td, tr.prio-sub-first th{border-top:none !important}
   tr.prio-row.has-sub td, tr.prio-row.has-sub th{padding-bottom:2px}
-  /* Divider on value columns only, not feature column, skipping first sub-row */
+  /* Priority variant — gold background */
+  tr.prio-sub.is-prio td, tr.prio-sub.is-prio th,
+  tr.prio-sub-last.is-prio td, tr.prio-sub-last.is-prio th{
+    background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06));
+  }
+  /* Non-priority variant — plain background */
+  tr.prio-sub:not(.is-prio) td, tr.prio-sub:not(.is-prio) th,
+  tr.prio-sub-last:not(.is-prio) td, tr.prio-sub-last:not(.is-prio) th{
+    background:var(--bg);
+  }
+  /* Divider on value columns only, skipping first sub-row */
   tr.prio-sub:not(.prio-sub-first) td:not(.col-feat),
   tr.prio-sub-last td:not(.col-feat){
     border-top:1px solid rgba(201,169,106,0.18) !important;
     padding-top:5px !important;
+  }
+  /* Non-priority divider is softer */
+  tr.prio-sub:not(.prio-sub-first):not(.is-prio) td:not(.col-feat),
+  tr.prio-sub-last:not(.is-prio) td:not(.col-feat){
+    border-top:1px solid var(--line-soft) !important;
   }
   /* Sub-label in feature column */
   .sub-label{
@@ -300,7 +313,7 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .sv-bullet::before{content:"·";color:var(--gold);font-weight:700;flex-shrink:0}
 
   /* wide lounge-map CTA inside compare table */
-  .map-cta-row td{padding:18px 0 6px;border-top:none}
+  .map-cta-row td{padding:18px 14px 6px;border-top:none}
   .map-cta{width:100%;display:flex;align-items:center;gap:18px;text-align:left;cursor:pointer;font-family:'Jost';color:var(--text);
     background:linear-gradient(100deg,rgba(201,169,106,0.17),rgba(201,169,106,0.04));border:1px solid var(--gold);border-radius:15px;padding:17px 24px;transition:.25s}
   .map-cta:hover{background:linear-gradient(100deg,rgba(201,169,106,0.28),rgba(201,169,106,0.08));transform:translateY(-2px);box-shadow:0 16px 38px -16px rgba(201,169,106,0.5)}
@@ -678,11 +691,12 @@ function cmpCell(c,p){
 }
 
 /* Generate sub-rows for a priority perk (lounge or insurance) */
-function subRows(fields, dataKey, cols){
+function subRows(fields, dataKey, cols, isPrio){
   return fields.map((f,i) => {
     const isFirst = i===0;
     const isLast  = i===fields.length-1;
-    const cls = isFirst ? 'prio-sub prio-sub-first' : (isLast ? 'prio-sub-last' : 'prio-sub');
+    const prioCls = isPrio ? ' is-prio' : '';
+    const cls = (isFirst ? 'prio-sub prio-sub-first' : (isLast ? 'prio-sub-last' : 'prio-sub')) + prioCls;
     return `<tr class="${cls}">
       <td class="col-feat fcell"><span class="sub-label${f.uw?' uw':''}">${f.label}</span></td>
       ${cols.map(c=>{
@@ -880,8 +894,8 @@ function renderCart(){
           ${cols.map(c=>cmpCell(c,p)).join('')}
         </tr>`;
         return mainRow
-          + subRows(LOUNGE_FIELDS,'lounge',cols)
-          + `<tr class="map-cta-row ${pr>-1?'prio-cta-row':''}"><td colspan="${cols.length+1}" style="padding-top:0;border-top:none;${pr>-1?'background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06))':''}">
+          + subRows(LOUNGE_FIELDS,'lounge',cols,pr>-1)
+          + `<tr class="map-cta-row ${pr>-1?'prio-cta-row':''}"><td colspan="${cols.length+1}" style="padding-top:0;padding-left:14px;border-top:none;${pr>-1?'background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06))':''}">
             <button class="map-cta" data-action="open-map">
               <span class="mc-ico">${svgIcon('lounge')}</span>
               <span class="mc-txt"><b>Explore the Lounge Access Map</b><span>See every partner lounge across the global network — by airport and region.</span></span>
@@ -900,7 +914,7 @@ function renderCart(){
           </th>
           ${cols.map(c=>cmpCell(c,p)).join('')}
         </tr>`;
-        return mainRow + subRows(INS_FIELDS,'insurance',cols);
+        return mainRow + subRows(INS_FIELDS,'insurance',cols,pr>-1);
       }
       return row;
     }).join('')}`;
