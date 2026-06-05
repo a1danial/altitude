@@ -178,7 +178,11 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .mini .mname{font-family:'Fraunces',serif;font-size:15px;line-height:1.1;margin-top:2px}
   .ccard .cmeta{padding:13px 4px 0}
   .ccard .cmeta .cn{font-family:'Fraunces',serif;font-size:16px}
-  .ccard .rm{margin-top:7px;font-size:11px;letter-spacing:0.04em;color:var(--text-faint);background:none;border:1px solid var(--line-soft);padding:5px 11px;border-radius:999px;cursor:pointer;transition:.2s}
+  .ccard .cmeta-btns{display:flex;align-items:center;gap:5px;margin-top:9px;flex-wrap:wrap}
+  .ccard .mv{background:none;border:1px solid var(--line-soft);color:var(--text-dim);width:24px;height:24px;border-radius:6px;cursor:pointer;display:grid;place-items:center;transition:.18s;font-size:12px}
+  .ccard .mv:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+  .ccard .mv:disabled{opacity:0.25;cursor:default}
+  .ccard .rm{font-size:11px;letter-spacing:0.04em;color:var(--text-faint);background:none;border:1px solid var(--line-soft);padding:5px 11px;border-radius:999px;cursor:pointer;transition:.2s}
   .ccard .rm:hover{border-color:#c97a7a;color:#d99}
 
   table.cmp tbody td,table.cmp tbody th{padding:15px 14px;border-top:1px solid var(--line-soft)}
@@ -300,11 +304,14 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   /* Sub-label in feature column */
   .sub-label{
     font-size:10px;letter-spacing:0.06em;text-transform:uppercase;
-    color:var(--gold);font-weight:500;
+    color:var(--text-faint);font-weight:500;
     display:block;text-align:right;
     padding:4px 8px 0 0;margin:0;line-height:1.45;
   }
   .sub-label.uw{color:var(--text-faint);font-weight:400}
+  /* Gold sub-labels only when row is priority */
+  tr.is-prio .sub-label{color:var(--gold)}
+  tr.is-prio .sub-label.uw{color:rgba(201,169,106,0.55)}
   /* Sub-value in card columns */
   .sv{font-size:13px;color:var(--text-dim);font-weight:300;line-height:1.45;padding:0;margin:0;display:block}
   .sv.na{color:var(--text-faint);font-style:italic}
@@ -334,29 +341,57 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   /* ============ LOUNGE MAP PAGE ============ */
   .map-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--text-dim);cursor:pointer;font-family:'Jost';font-size:13.5px;margin-bottom:14px;transition:.2s}
   .map-back:hover{color:var(--gold)}
-  .map-context{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 20px;margin:24px 0 4px;max-width:520px}
-  .map-context .mc-card{width:70px;flex-shrink:0;border-radius:9px;aspect-ratio:1.585/1;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 22px -12px rgba(0,0,0,0.8)}
-  .map-context .info b{font-family:'Fraunces',serif;font-weight:400;font-size:18px;display:block}
-  .map-context .info span{font-size:12.5px;color:var(--text-dim);font-weight:300;line-height:1.5}
-  .worldmap{position:relative;border:1px solid var(--line-soft);border-radius:20px;overflow:hidden;margin-top:30px;padding:14px;
-    background:radial-gradient(ellipse 60% 70% at 78% 48%, rgba(201,169,106,0.1), transparent 60%), var(--surface)}
+  .worldmap{position:relative;border:1px solid var(--line-soft);border-radius:20px;overflow:hidden;margin-top:24px;
+    background:radial-gradient(ellipse 80% 60% at 60% 50%, rgba(201,169,106,0.07), transparent 65%), var(--surface)}
   .worldmap svg{width:100%;height:auto;display:block}
-  .worldmap .grid{stroke:rgba(255,255,255,0.045);stroke-width:1}
-  .worldmap .arc{fill:none;stroke:rgba(201,169,106,0.32);stroke-width:1.1;stroke-dasharray:5 7;animation:arcIn .9s ease both, dash 22s linear infinite}
+  .worldmap .grid{stroke:rgba(255,255,255,0.04);stroke-width:0.8}
+  .worldmap .arc{fill:none;stroke:rgba(201,169,106,0.35);stroke-width:1.2;stroke-dasharray:5 7;animation:arcIn .9s ease both,dash 22s linear infinite}
   @keyframes arcIn{from{opacity:0}to{opacity:1}}
   @keyframes dash{to{stroke-dashoffset:-120}}
   .worldmap .mk{animation:fade .55s ease both}
   .worldmap .dot{fill:var(--gold)}
-  .worldmap .mk.home .dot{fill:var(--gold-bright)}
-  .worldmap .pulse{fill:rgba(201,169,106,0.2);transform-box:fill-box;transform-origin:center;animation:pulse 2.8s ease-out infinite}
-  @keyframes pulse{0%{transform:scale(0.5);opacity:0.7}70%{opacity:0}100%{transform:scale(1.7);opacity:0}}
-  .worldmap .lab{fill:var(--text-dim);font-family:'Jost',sans-serif;font-size:13px;text-anchor:middle;font-weight:400}
-  .worldmap .mk.home .lab{fill:var(--gold-bright);font-weight:500}
-  .region-bar{display:flex;flex-wrap:wrap;gap:9px;margin:26px 0 22px}
-  .rchip{padding:9px 18px;border-radius:999px;border:1px solid var(--line-soft);background:var(--surface);color:var(--text-dim);cursor:pointer;font-size:13.5px;transition:.22s;font-family:'Jost'}
+  .worldmap .home-dot{fill:var(--gold-bright)}
+  .worldmap .lounge-dot{fill:var(--gold);filter:drop-shadow(0 0 6px rgba(201,169,106,0.7))}
+  .worldmap .pulse{fill:rgba(201,169,106,0.18);transform-box:fill-box;transform-origin:center;animation:pulse 2.8s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(0.5);opacity:0.7}70%{opacity:0}100%{transform:scale(2);opacity:0}}
+  .worldmap .lab{fill:var(--text-dim);font-family:'Jost',sans-serif;font-size:12px;text-anchor:middle;font-weight:400}
+  .worldmap .home-lab{fill:var(--gold-bright);font-weight:500;font-size:13px}
+
+  /* Card banners below map */
+  .map-cards-section{display:flex;flex-wrap:wrap;gap:14px;margin:24px 0 0}
+  /* Vertical layout: card image on top, details below */
+  .map-card-banner{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line-soft);border-radius:18px;padding:16px;width:200px;flex-shrink:0;animation:rise .4s ease both;position:relative;overflow:hidden}
+  .map-card-banner.clickable{cursor:pointer;transition:.22s}
+  .map-card-banner.clickable:hover{border-color:var(--gold);background:var(--surface-2);transform:translateY(-3px);box-shadow:0 16px 36px -16px rgba(0,0,0,0.5)}
+  .map-card-banner.active-banner{border-color:var(--gold);background:linear-gradient(160deg,var(--gold-bright),var(--gold));box-shadow:0 14px 32px -12px rgba(201,169,106,0.55);transform:translateY(-3px)}
+  .map-card-banner.active-banner .mcb-name{color:#1a1408}
+  .map-card-banner.active-banner .mcb-meta{color:rgba(26,20,8,0.65)}
+  .map-card-banner.active-banner .mcb-hint{color:rgba(26,20,8,0.55)}
+  .mcb-card{width:100%;aspect-ratio:1.585/1;border-radius:11px;padding:12px 14px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 14px 28px -14px rgba(0,0,0,0.85);display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+  .mcb-card::after{content:"";position:absolute;top:-30%;left:-10%;width:45%;height:180%;transform:rotate(18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,0.13),transparent)}
+  .mcb-card-top{display:flex;justify-content:space-between;align-items:flex-start}
+  .mcb-card .chip{width:28px;height:20px;border-radius:5px;background:linear-gradient(135deg,#e6cf9a,#b18f4f);position:relative;flex-shrink:0}
+  .mcb-card .chip::before{content:"";position:absolute;inset:4px 5px;border:0.5px solid rgba(0,0,0,0.25);border-radius:2px}
+  .mcb-net{font-size:8px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.85}
+  .mcb-tier{font-size:8px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.75;margin-bottom:2px}
+  .mcb-cname{font-family:'Fraunces',serif;font-size:13px;line-height:1.1}
+  /* Details below card */
+  .mcb-info{margin-top:14px}
+  .mcb-name{font-family:'Fraunces',serif;font-weight:400;font-size:15px;line-height:1.2}
+  .mcb-meta{font-size:12px;color:var(--text-dim);font-weight:300;margin-top:4px;line-height:1.4}
+  .mcb-hint{font-size:10.5px;color:var(--gold);margin-top:8px;font-weight:400;letter-spacing:0.02em}
+
+  /* Section labels */
+  .map-section-label{font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:var(--text-faint);margin:26px 0 10px}
+
+  /* Region / card filter chips */
+  .region-bar{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 8px}
+  .rchip{padding:9px 18px;border-radius:999px;border:1px solid var(--line-soft);background:var(--surface);color:var(--text-dim);cursor:pointer;font-size:13px;transition:.22s;font-family:'Jost'}
   .rchip:hover{color:var(--text);border-color:var(--line)}
   .rchip.active{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#1a1408;border-color:var(--gold)}
-  .lounge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(282px,1fr));gap:16px;padding-bottom:80px}
+
+  /* Lounge cards grid */
+  .lounge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;padding-bottom:80px;margin-top:20px}
   .lcard2{background:var(--surface);border:1px solid var(--line-soft);border-radius:16px;padding:21px;transition:.25s;animation:rise .45s ease both}
   .lcard2:hover{border-color:var(--gold);transform:translateY(-3px);background:var(--surface-2)}
   .lcard2 .l2top{display:flex;justify-content:space-between;align-items:center;gap:12px}
@@ -365,7 +400,7 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .lcard2 h3{font-family:'Fraunces',serif;font-weight:400;font-size:18px;margin:13px 0 2px}
   .lcard2 .city{font-size:13px;color:var(--text-dim);font-weight:300}
   .lcard2 .term{font-size:12.5px;color:var(--text-faint);margin-top:11px;line-height:1.45}
-  .lcard2 .amen{display:flex;flex-wrap:wrap;gap:6px;margin-top:15px}
+  .lcard2 .amen{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
   .lcard2 .amen span{font-size:11px;color:var(--text-dim);background:var(--surface-2);border:1px solid var(--line-soft);padding:4px 10px;border-radius:999px;font-weight:300}
 
   /* footer */
@@ -488,27 +523,27 @@ const STATIC_CARDS = [
   {id:'aurora', name:'Aurora Infinite', tier:'Invitation Only', net:'World Elite', num:'•••• 0001',
    theme:'linear-gradient(135deg,#1c1812 0%,#3a2f17 45%,#0c0a07 100%)', fg:'#ecdcb4',
    minSalary:600000, fee:3180, waiver:'By invitation — non-waivable',
-   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 1 supplementary + unlimited guests',condition:null,lounges:'1,300+ lounges worldwide · Priority Pass Select'},insurance:{inconveniences:'Trip cancellation up to RM 50,000\nTrip delay up to RM 5,000 · min. 6-hour delay',medical:'Up to RM 1,000,000 overseas medical & hospitalisation',accident:'Up to RM 5,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'AIG Malaysia Insurance Berhad'},overseas:'5% cashback, all currencies',miles:'2.0 miles per RM 1',transfer:'8 limousine transfers / year',fasttrack:'Priority lanes at 30+ airports',hotel:'Marriott & Hilton elite status',golf:'Unlimited green fees',concierge:'Dedicated lifestyle manager',roaming:'Unlimited data, 100+ countries',businessclass:'Up to 35% off business class',wifi:'Full in-flight WiFi credit',protection:'180-day purchase protection'}},
+   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 1 supplementary + unlimited guests',condition:null,lounges:'1,300+ lounges worldwide · Priority Pass Select'},insurance:{inconveniences:'Trip cancellation up to RM 50,000\nTrip delay up to RM 5,000 · min. 6-hour delay',medical:'Up to RM 1,000,000 overseas medical & hospitalisation',accident:'Up to RM 5,000,000 accidental death & disablement',condition:'Active cardholder, no flight purchase required',underwriter:'AIG Malaysia Insurance Berhad'},overseas:'5% cashback, all currencies',miles:'2.0 miles per RM 1',transfer:'8 limousine transfers / year',fasttrack:'Priority lanes at 30+ airports',hotel:'Marriott & Hilton elite status',golf:'Unlimited green fees',concierge:'Dedicated lifestyle manager',roaming:'Unlimited data, 100+ countries',businessclass:'Up to 35% off business class',wifi:'Full in-flight WiFi credit',protection:'180-day purchase protection'}},
   {id:'meridian', name:'Meridian Reserve', tier:'Reserve', net:'World Elite', num:'•••• 1875',
    theme:'linear-gradient(135deg,#0e1a16 0%,#163a31 50%,#08110e 100%)', fg:'#cfe6da',
    minSalary:300000, fee:1500, waiver:'Waived with RM 150,000 annual spend',
-   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 1 guest',condition:null,lounges:'1,300+ lounges · Priority Pass'},insurance:{inconveniences:'Trip cancellation up to RM 30,000\nTrip delay up to RM 3,000 · min. 6-hour delay',medical:'Up to RM 500,000 overseas medical & hospitalisation',accident:'Up to RM 2,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'Chubb Insurance Malaysia Berhad'},overseas:'3% cashback, all currencies',miles:'1.5 miles per RM 1',transfer:'4 limousine transfers / year',fasttrack:'Priority lanes, select airports',hotel:'Hilton Honors Gold status',golf:'12 green fees / year',concierge:'24/7 concierge desk',roaming:null,businessclass:'Up to 20% off business class',wifi:'RM 200 WiFi credit / year',protection:'90-day purchase protection'}},
+   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 1 guest',condition:null,lounges:'1,300+ lounges · Priority Pass'},insurance:{inconveniences:'Trip cancellation up to RM 30,000\nTrip delay up to RM 3,000 · min. 6-hour delay',medical:'Up to RM 500,000 overseas medical & hospitalisation',accident:'Up to RM 2,000,000 accidental death & disablement',condition:'Active cardholder, no flight purchase required',underwriter:'Chubb Insurance Malaysia Berhad'},overseas:'3% cashback, all currencies',miles:'1.5 miles per RM 1',transfer:'4 limousine transfers / year',fasttrack:'Priority lanes, select airports',hotel:'Hilton Honors Gold status',golf:'12 green fees / year',concierge:'24/7 concierge desk',roaming:null,businessclass:'Up to 20% off business class',wifi:'RM 200 WiFi credit / year',protection:'90-day purchase protection'}},
   {id:'horizon', name:'Horizon World Elite', tier:'World Elite', net:'World Elite', num:'•••• 4421',
    theme:'linear-gradient(135deg,#0c1320 0%,#1d2c47 50%,#080d16 100%)', fg:'#cdd9ee',
    minSalary:200000, fee:1080, waiver:'Waived with RM 100,000 annual spend',
-   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 2 guests',condition:'Min. RM 6,000 spend in each qualifying quarter',lounges:'1,300+ lounges · Priority Pass'},insurance:{inconveniences:'Trip cancellation up to RM 20,000\nTrip delay up to RM 2,000 · min. 6-hour delay',medical:'Up to RM 500,000 overseas medical & hospitalisation',accident:'Up to RM 2,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'Chubb Insurance Malaysia Berhad'},overseas:'2.5% cashback, all currencies',miles:'1.5 miles per RM 1',transfer:'2 limousine transfers / year',fasttrack:'Fast-track at KLIA',hotel:'Accor Plus membership',golf:'8 green fees / year',concierge:'24/7 concierge desk',roaming:'Unlimited data, 50 countries',businessclass:'Up to 15% off premium fares',wifi:'RM 150 WiFi credit / year',protection:'90-day purchase protection'}},
+   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 2 guests',condition:'Min. RM 6,000 spend in each qualifying quarter',lounges:'1,300+ lounges · Priority Pass'},insurance:{inconveniences:'Trip cancellation up to RM 20,000\nTrip delay up to RM 2,000 · min. 6-hour delay',medical:'Up to RM 500,000 overseas medical & hospitalisation',accident:'Up to RM 2,000,000 accidental death & disablement',condition:'Active cardholder, no flight purchase required',underwriter:'Chubb Insurance Malaysia Berhad'},overseas:'2.5% cashback, all currencies',miles:'1.5 miles per RM 1',transfer:'2 limousine transfers / year',fasttrack:'Fast-track at KLIA',hotel:'Accor Plus membership',golf:'8 green fees / year',concierge:'24/7 concierge desk',roaming:'Unlimited data, 50 countries',businessclass:'Up to 15% off premium fares',wifi:'RM 150 WiFi credit / year',protection:'90-day purchase protection'}},
   {id:'solstice', name:'Solstice Platinum', tier:'Platinum', net:'Signature', num:'•••• 6630',
    theme:'linear-gradient(135deg,#1d1d20 0%,#3c3c43 50%,#141416 100%)', fg:'#e3e3e8',
    minSalary:150000, fee:800, waiver:'Waived with RM 80,000 annual spend',
-   perks:{lounge:{visits:'6 visits / year',access:'Cardholder only',condition:'Min. RM 500 single or cumulative spend within 30 days before / after lounge entry',lounges:'25 Plaza Premium Lounges · Asia-Pacific'},insurance:{inconveniences:null,medical:null,accident:'Up to RM 1,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'N/A — confirm with issuer'},overseas:'2% cashback, all currencies',miles:'1.2 miles per RM 1',transfer:'2 airport transfers / year',fasttrack:null,hotel:null,golf:'6 green fees / year',concierge:'24/7 concierge desk',roaming:null,businessclass:null,wifi:null,protection:'90-day purchase protection'}},
+   perks:{lounge:{visits:'6 visits / year',access:'Cardholder only',condition:'Min. RM 500 single or cumulative spend within 30 days before / after lounge entry',lounges:'25 Plaza Premium Lounges · Asia-Pacific'},insurance:{inconveniences:null,medical:null,accident:'Up to RM 1,000,000 accidental death & disablement',condition:'Active cardholder, no flight purchase required',underwriter:'N/A — confirm with issuer'},overseas:'2% cashback, all currencies',miles:'1.2 miles per RM 1',transfer:'2 airport transfers / year',fasttrack:null,hotel:null,golf:'6 green fees / year',concierge:'24/7 concierge desk',roaming:null,businessclass:null,wifi:null,protection:'90-day purchase protection'}},
   {id:'voyager', name:'Voyager Signature', tier:'Signature', net:'Signature', num:'•••• 2208',
    theme:'linear-gradient(135deg,#241712 0%,#4c3120 50%,#150d08 100%)', fg:'#ecd6bf',
    minSalary:120000, fee:600, waiver:'Waived with RM 60,000 annual spend',
-   perks:{lounge:{visits:'4 visits / year',access:'Cardholder + 1 guest (shared quota)',condition:null,lounges:'Plaza Premium Lounges · Malaysia'},insurance:{inconveniences:null,medical:null,accident:'Up to RM 1,000,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'N/A — confirm with issuer'},overseas:'1.5% cashback, all currencies',miles:'1.0 mile per RM 1',transfer:null,fasttrack:null,hotel:null,golf:null,concierge:'Travel concierge desk',roaming:'RM 50 roaming credit / trip',businessclass:null,wifi:null,protection:'60-day purchase protection'}},
+   perks:{lounge:{visits:'4 visits / year',access:'Cardholder + 1 guest (shared quota)',condition:null,lounges:'Plaza Premium Lounges · Malaysia'},insurance:{inconveniences:null,medical:null,accident:'Up to RM 1,000,000 accidental death & disablement',condition:'Active cardholder, no flight purchase required',underwriter:'N/A — confirm with issuer'},overseas:'1.5% cashback, all currencies',miles:'1.0 mile per RM 1',transfer:null,fasttrack:null,hotel:null,golf:null,concierge:'Travel concierge desk',roaming:'RM 50 roaming credit / trip',businessclass:null,wifi:null,protection:'60-day purchase protection'}},
   {id:'equator', name:'Equator Gold', tier:'Gold', net:'Gold', num:'•••• 9914',
    theme:'linear-gradient(135deg,#2a2114 0%,#5e4824 50%,#1a1409 100%)', fg:'#f0dcb0',
    minSalary:60000, fee:240, waiver:'Waived with RM 30,000 annual spend',
-   perks:{lounge:{visits:'2 visits / year',access:'Cardholder only',condition:'Min. RM 3,000 spend in the preceding calendar month',lounges:'Plaza Premium Lounge · KLIA & KLIA2'},insurance:{inconveniences:null,medical:null,accident:'Up to RM 500,000 accidental death & disablement',activation:'Active cardholder, no flight purchase required',underwriter:'N/A — confirm with issuer'},overseas:'1% cashback, all currencies',miles:'0.8 miles per RM 1',transfer:null,fasttrack:null,hotel:null,golf:null,concierge:null,roaming:null,businessclass:null,wifi:null,protection:'60-day purchase protection'}}
+   perks:{lounge:{visits:'2 visits / year',access:'Cardholder only',condition:'Min. RM 3,000 spend in the preceding calendar month',lounges:'Plaza Premium Lounge · KLIA & KLIA2'},insurance:{inconveniences:null,medical:null,accident:'Up to RM 500,000 accidental death & disablement',condition:'Active cardholder, no flight purchase required',underwriter:'N/A — confirm with issuer'},overseas:'1% cashback, all currencies',miles:'0.8 miles per RM 1',transfer:null,fasttrack:null,hotel:null,golf:null,concierge:null,roaming:null,businessclass:null,wifi:null,protection:'60-day purchase protection'}}
 ];
 
 const STATIC_LOUNGES = [
@@ -547,22 +582,15 @@ const PERK = id => PERKS.find(p=>p.id===id);
 const CARD = id => CARDS.find(c=>c.id===id);
 let DEFAULT_ORDER=[], DEFAULT_TOP3=['lounge','insurance','overseas'];
 
-const HUBS=[
-  {city:'Kuala Lumpur',code:'KUL',lon:101.7,lat:3.1,home:true,lounges:4},
-  {city:'Singapore',code:'SIN',lon:103.8,lat:1.35,lounges:3},
-  {city:'Hong Kong',code:'HKG',lon:114.2,lat:22.3,lounges:3},
-  {city:'Tokyo',code:'HND',lon:139.7,lat:35.7,lounges:2},
-  {city:'Bangkok',code:'BKK',lon:100.5,lat:13.7,lounges:2},
-  {city:'Sydney',code:'SYD',lon:151.2,lat:-33.9,lounges:2},
-  {city:'Dubai',code:'DXB',lon:55.3,lat:25.2,lounges:4},
-  {city:'Doha',code:'DOH',lon:51.5,lat:25.3,lounges:2},
-  {city:'Istanbul',code:'IST',lon:29,lat:41,lounges:2},
-  {city:'London',code:'LHR',lon:-0.45,lat:51.47,lounges:5},
-  {city:'Frankfurt',code:'FRA',lon:8.57,lat:50.03,lounges:3},
-  {city:'New York',code:'JFK',lon:-73.78,lat:40.64,lounges:3},
-  {city:'Los Angeles',code:'LAX',lon:-118.4,lat:33.94,lounges:2}
+/* HUBS are derived from LOUNGES at render time — this array is kept for the home marker only */
+const HOME_HUB = {city:'Kuala Lumpur', code:'KUL', lon:101.7, lat:3.1};
+const REGIONS=[
+  {id:'apac',    label:'Asia-Pacific'},
+  {id:'mideast', label:'Middle East'},
+  {id:'europe',  label:'Europe'},
+  {id:'americas',label:'Americas'},
+  {id:'africa',  label:'Africa'}
 ];
-const REGIONS=[{id:'all',label:'All regions'},{id:'apac',label:'Asia-Pacific'},{id:'mideast',label:'Middle East'},{id:'europe',label:'Europe'},{id:'americas',label:'Americas'}];
 
 async function loadData(){
   document.getElementById('loader').style.display='flex';
@@ -605,7 +633,13 @@ async function loadData(){
         };
       }
       /* flat perk columns — note: overseas imported as "overseas+" in Airtable */
-      perks.insurance    = f['insurance']     ||null;
+      perks.insurance = {
+        inconveniences: f['insurance_inconveniences'] || null,
+        medical:        f['insurance_medical']        || null,
+        accident:       f['insurance_accident']       || null,
+        condition:      f['insurance_condition']      || null,
+        underwriter:    f['insurance_underwriter']    || null,
+      };
       perks.overseas     = f['overseas']||f['overseas+']||null;
       perks.miles        = f['miles']         ||null;
       perks.transfer     = f['transfer']      ||null;
@@ -639,13 +673,17 @@ async function loadData(){
     /* --- LOUNGES --- */
     const loungeRecs = await atFetchAll('Lounges');
     LOUNGES = loungeRecs.map(r=>({
+      id:     r.fields.id     || r.id,
       code:   r.fields.code,
       city:   r.fields.city,
       name:   r.fields.name,
       term:   r.fields.term,
       net:    r.fields.net,
       region: r.fields.region,
-      amen:   (r.fields.amen||'').split('|').map(s=>s.trim()).filter(Boolean)
+      lon:    parseFloat(r.fields.lon) || 0,
+      lat:    parseFloat(r.fields.lat) || 0,
+      amen:   (r.fields.amen||'').split('|').map(s=>s.trim()).filter(Boolean),
+      cards:  (r.fields.cards||'').split('|').map(s=>s.trim()).filter(Boolean)
     }));
 
   } catch(err){
@@ -662,7 +700,6 @@ async function loadData(){
   render();
 }
 
-/* compare-table cell renderer (lounge gets structured detail) */
 /* Sub-row fields for lounge and insurance */
 const LOUNGE_FIELDS = [
   {key:'visits',    label:'Visits'},
@@ -674,7 +711,7 @@ const INS_FIELDS = [
   {key:'inconveniences', label:'Travel Disruptions', uw:false},
   {key:'medical',        label:'Medical',            uw:false},
   {key:'accident',       label:'Accident',           uw:false},
-  {key:'activation',     label:'Condition',          uw:false},
+  {key:'condition',      label:'Condition',          uw:false},
   {key:'underwriter',    label:'Underwriter',        uw:true},
 ];
 
@@ -712,8 +749,27 @@ function subRows(fields, dataKey, cols, isPrio){
   }).join('');
 }
 
+/* DEAD CODE BELOW — kept for reference only, replaced by cmpCell above */
+function _old_cmpCell_lounge_det(c,p){
+  const v=c.perks[p.id];
+  if(!v) return `<td><span class="cell-no">—</span></td>`;
+  if(p.id==='lounge'){
+    return `<td><div class="cell-yes"><span class="ck">${CHECK} Included</span>
+      <span class="lounge-det">
+        <span class="ld"><span class="lk">Visits</span><span class="lv">${v.visits}</span></span>
+        <span class="ld"><span class="lk">Access</span><span class="lv">${v.access}</span></span>
+        <span class="ld"><span class="lk">Lounges</span><span class="lv">${v.lounges}</span></span>
+        <span class="ld"><span class="lk">Condition</span><span class="lv">${v.condition||'No spend condition'}</span></span>
+      </span></div></td>`;
+  }
+  if(p.id==='insurance' && c.insuranceNote){
+    return `<td><div class="cell-yes"><span class="ck">${CHECK} Included</span><div class="det">${v}</div><div class="det-note">${c.insuranceNote}</div></div></td>`;
+  }
+  return `<td><div class="cell-yes"><span class="ck">${CHECK} Included</span><div class="det">${v}</div></div></td>`;
+}
+
 /* ============================== STATE ============================== */
-const state = { page:'profile', selected:[], cart:[], expanded:new Set(), mapReturn:'listing', mapCard:null, mapRegion:'all' };
+const state = { page:'profile', selected:[], cart:[], expanded:new Set(), mapReturn:'listing', mapCard:null, mapRegion:'all', mapActiveCard:null };
 
 /* derived */
 function orderedPerks(){
@@ -852,7 +908,11 @@ function renderCart(){
         <div class="mname">${c.name}</div>
       </div>
       <div class="cmeta">
-        <button class="rm" data-action="remove-cart-card" data-card="${c.id}">Remove ×</button>
+        <div class="cmeta-btns">
+          <button class="mv" data-action="move-cart-left"  data-card="${c.id}" ${state.cart.indexOf(c.id)===0?'disabled':''} title="Move left">←</button>
+          <button class="mv" data-action="move-cart-right" data-card="${c.id}" ${state.cart.indexOf(c.id)===state.cart.length-1?'disabled':''} title="Move right">→</button>
+          <button class="rm" data-action="remove-cart-card" data-card="${c.id}">Remove ×</button>
+        </div>
       </div>
     </th>`).join('')}
   </tr></thead>`;
@@ -883,6 +943,15 @@ function renderCart(){
         ${cols.map(c=>cmpCell(c,p)).join('')}
       </tr>`;
       if(p.id==='lounge'){
+        const ctaRow = `<tr class="map-cta-row ${pr>-1?'prio-cta-row':''}">
+          <td colspan="${cols.length+1}" style="padding-top:0;padding-left:14px;padding-bottom:12px;border-top:none;${pr>-1?'background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06))':''}">
+            <button class="map-cta" data-action="open-map">
+              <span class="mc-ico">${svgIcon('lounge')}</span>
+              <span class="mc-txt"><b>Explore the Lounge Access Map</b><span>See every partner lounge across the global network — by airport and region.</span></span>
+              <span class="arr">→</span>
+            </button>
+          </td>
+        </tr>`;
         const mainRow = `<tr class="${pr>-1?'prio-row has-sub':''}">
           <th class="col-feat fcell">
             <div class="fname ${pr>-1?'prio':''}">
@@ -893,15 +962,7 @@ function renderCart(){
           </th>
           ${cols.map(c=>cmpCell(c,p)).join('')}
         </tr>`;
-        return mainRow
-          + subRows(LOUNGE_FIELDS,'lounge',cols,pr>-1)
-          + `<tr class="map-cta-row ${pr>-1?'prio-cta-row':''}"><td colspan="${cols.length+1}" style="padding-top:0;padding-left:14px;border-top:none;${pr>-1?'background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06))':''}">
-            <button class="map-cta" data-action="open-map">
-              <span class="mc-ico">${svgIcon('lounge')}</span>
-              <span class="mc-txt"><b>Explore the Lounge Access Map</b><span>See every partner lounge across the global network — by airport and region.</span></span>
-              <span class="arr">→</span>
-            </button>
-          </td></tr>`;
+        return mainRow + subRows(LOUNGE_FIELDS,'lounge',cols,pr>-1) + ctaRow;
       }
       if(p.id==='insurance'){
         const mainRow = `<tr class="${pr>-1?'prio-row has-sub':''}">
@@ -965,7 +1026,7 @@ function renderListing(){
       }).join('')}
     </div>` : '';
 
-    return `<div class="lrow" style="animation-delay:${i*60}ms">
+    return `<div class="lrow ${inCart?'in-cart':''}" style="animation-delay:${i*60}ms">
       <div class="lcard" style="background:${c.theme};color:${c.fg}">
         <div class="ltop"><div class="chip"></div><div class="net">${c.net}</div></div>
         <div>
@@ -1010,63 +1071,140 @@ function renderListing(){
 
 /* ============================== RENDER: LOUNGE MAP ============================== */
 function renderMap(){
-  const region = state.mapRegion||'all';
-  const list = region==='all'?LOUNGES:LOUNGES.filter(l=>l.region===region);
-  const W=1000,H=500;
-  const proj=(lon,lat)=>[(lon+180)/360*W,(72-lat)/144*H];
-  const home=HUBS.find(h=>h.home); const [hx,hy]=proj(home.lon,home.lat);
+  /* Relevant cards depend on entry point */
+  const relevantCardIds = state.mapCard
+    ? [state.mapCard]
+    : state.cart.length ? state.cart : CARDS.map(c=>c.id);
+  const relevantCards = relevantCardIds.map(CARD).filter(Boolean);
+  const activeCard = state.mapActiveCard;
 
-  const arcs=HUBS.filter(h=>!h.home).map((h,i)=>{
-    const [x,y]=proj(h.lon,h.lat);
-    const mx=(hx+x)/2, my=(hy+y)/2 - Math.hypot(x-hx,y-hy)*0.18;
-    return `<path class="arc" style="animation-delay:${i*110}ms" d="M${hx.toFixed(1)} ${hy.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}"/>`;
-  }).join('');
+  /* Lounges visible to relevant cards, filtered by active card + region */
+  const relevantLounges = LOUNGES.filter(l => l.cards.some(cid => relevantCardIds.includes(cid)));
+  const visibleLounges  = relevantLounges
+    .filter(l => !activeCard || l.cards.includes(activeCard))
+    .filter(l => !state.mapRegion || l.region===state.mapRegion);
 
-  const markers=HUBS.map((h,i)=>{
-    const [x,y]=proj(h.lon,h.lat);
-    const r = h.home?7:3.6+h.lounges*0.5;
-    return `<g class="mk ${h.home?'home':''}" style="animation-delay:${320+i*55}ms">
-      ${h.home?`<circle cx="${x}" cy="${y}" r="15" class="pulse"/>`:''}
-      <circle cx="${x}" cy="${y}" r="${r}" class="dot"/>
-      <text x="${x}" y="${(y-r-7).toFixed(1)}" class="lab">${h.code}</text>
+  /* --- Smart viewport bounds — zooms to match visible lounges --- */
+  const boundsPoints = [HOME_HUB, ...(visibleLounges.length ? visibleLounges : relevantLounges).map(l=>({lon:l.lon,lat:l.lat}))];
+  let minLon=Math.min(...boundsPoints.map(p=>p.lon)), maxLon=Math.max(...boundsPoints.map(p=>p.lon));
+  let minLat=Math.min(...boundsPoints.map(p=>p.lat)), maxLat=Math.max(...boundsPoints.map(p=>p.lat));
+  const padLon=Math.max((maxLon-minLon)*0.3,14), padLat=Math.max((maxLat-minLat)*0.36,12);
+  minLon=Math.max(minLon-padLon,-175); maxLon=Math.min(maxLon+padLon,175);
+  minLat=Math.max(minLat-padLat,-60);  maxLat=Math.min(maxLat+padLat,75);
+
+  const W=900, H=400;
+  const proj=(lon,lat)=>[(lon-minLon)/(maxLon-minLon)*W, (maxLat-lat)/(maxLat-minLat)*H];
+
+  /* Grid */
+  let grid='';
+  const gStep=(maxLon-minLon)>80?30:15;
+  for(let lon=Math.ceil(minLon/gStep)*gStep;lon<=maxLon;lon+=gStep){const [x]=proj(lon,0);if(x>=0&&x<=W)grid+=`<line x1="${x.toFixed(1)}" y1="0" x2="${x.toFixed(1)}" y2="${H}" class="grid"/>`;}
+  for(let lat=Math.ceil(minLat/gStep)*gStep;lat<=maxLat;lat+=gStep){const [,y]=proj(0,lat);if(y>=0&&y<=H)grid+=`<line x1="0" y1="${y.toFixed(1)}" x2="${W}" y2="${y.toFixed(1)}" class="grid"/>`;}
+
+  /* Home marker */
+  const [hx,hy]=proj(HOME_HUB.lon,HOME_HUB.lat);
+  const homeMarker=`<g class="mk home">
+    <circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="18" class="pulse"/>
+    <circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="7" class="home-dot"/>
+    <text x="${hx.toFixed(1)}" y="${(hy-16).toFixed(1)}" class="home-lab">${HOME_HUB.code}</text>
+  </g>`;
+
+  /* Lounge airport markers — built from visibleLounges so the map updates with card/region filters */
+  const airportMap={};
+  visibleLounges.forEach(l=>{if(!airportMap[l.code])airportMap[l.code]={lon:l.lon,lat:l.lat,code:l.code,count:0};airportMap[l.code].count++;});
+  const airportMarkers=Object.values(airportMap).map((a,i)=>{
+    const [x,y]=proj(a.lon,a.lat);
+    const r=5+Math.min(a.count,3)*1.5;
+    return `<g class="mk lounge-mk" style="animation-delay:${200+i*80}ms">
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" class="lounge-dot"/>
+      <text x="${x.toFixed(1)}" y="${(y-r-6).toFixed(1)}" class="lab">${a.code}</text>
     </g>`;
   }).join('');
 
-  let grid='';
-  for(let lon=-150;lon<=150;lon+=30){const [x]=proj(lon,0);grid+=`<line x1="${x.toFixed(1)}" y1="0" x2="${x.toFixed(1)}" y2="${H}" class="grid"/>`;}
-  for(let lat=60;lat>=-60;lat-=30){const [,y]=proj(0,lat);grid+=`<line x1="0" y1="${y.toFixed(1)}" x2="${W}" y2="${y.toFixed(1)}" class="grid"/>`;}
+  /* Arcs — also from visibleLounges */
+  const arcs=Object.values(airportMap).map((a,i)=>{
+    const [x,y]=proj(a.lon,a.lat);
+    const mx=(hx+x)/2, my=(hy+y)/2-Math.hypot(x-hx,y-hy)*0.22;
+    return `<path class="arc" style="animation-delay:${i*130}ms" d="M${hx.toFixed(1)} ${hy.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}"/>`;
+  }).join('');
 
-  const ctx = state.mapCard?CARD(state.mapCard):null;
-  const ctxBanner = ctx?`<div class="map-context">
-     <div class="mc-card" style="background:${ctx.theme}"></div>
-     <div class="info"><b>${ctx.name}</b><span>${ctx.perks.lounge.visits} · ${ctx.perks.lounge.access}<br>${ctx.perks.lounge.lounges}</span></div>
-   </div>`:'';
+  /* Card banners — clickable to filter; vertical layout: card image on top, details below */
+  const multiCard = relevantCards.length > 1;
+  const cardBanners = relevantCards.map(c => {
+    const isActive = activeCard === c.id;
+    const cardLounges = LOUNGES.filter(l => l.cards.includes(c.id) && relevantCardIds.includes(c.id));
+    /* Toggle: clicking active card resets filter; clicking inactive sets it */
+    const nextCard = isActive ? '' : c.id;
+    return `<div class="map-card-banner ${multiCard?'clickable':''} ${isActive?'active-banner':''}"
+      ${multiCard?`data-action="map-filter-card" data-card="${nextCard}"`:''}>
+      <div class="mcb-card" style="background:${c.theme};color:${c.fg}">
+        <div class="mcb-card-top">
+          <div class="chip"></div>
+          <div class="mcb-net">${c.net}</div>
+        </div>
+        <div>
+          <div class="mcb-tier">${c.tier}</div>
+          <div class="mcb-cname">${c.name}</div>
+        </div>
+      </div>
+      <div class="mcb-info">
+        <div class="mcb-name">${c.name}</div>
+        <div class="mcb-meta">${c.perks.lounge?c.perks.lounge.visits:'—'}</div>
+        <div class="mcb-meta">${cardLounges.length} lounge${cardLounges.length!==1?'s':''} in network</div>
+        ${multiCard?`<div class="mcb-hint">${isActive?'↩ Show all cards':'Tap to filter map'}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
 
-  const cards = list.map((l,i)=>`<div class="lcard2" style="animation-delay:${i*40}ms">
-     <div class="l2top"><div class="code">${l.code}</div><div class="net2">${l.net}</div></div>
-     <h3>${l.name}</h3>
-     <div class="city">${l.city}</div>
-     <div class="term">${l.term}</div>
-     <div class="amen">${l.amen.map(a=>`<span>${a}</span>`).join('')}</div>
-   </div>`).join('');
+  /* Region chips — only regions that have lounges for relevant cards */
+  const activeRegions=[...new Set(relevantLounges.map(l=>l.region))];
+  const regionChips=REGIONS.filter(r=>activeRegions.includes(r.id)).map(r=>
+    `<button class="rchip ${state.mapRegion===r.id?'active':''}" data-action="map-region" data-region="${r.id}">${r.label}</button>`
+  ).join('');
+
+  /* Lounge grid */
+  const loungeCards=visibleLounges.map((l,i)=>{
+    const accessCards=relevantCards.filter(c=>l.cards.includes(c.id));
+    return `<div class="lcard2" style="animation-delay:${i*50}ms">
+      <div class="l2top"><div class="code">${l.code}</div><div class="net2">${l.net}</div></div>
+      <h3>${l.name}</h3>
+      <div class="city">${l.city}</div>
+      <div class="term">${l.term}</div>
+      <div class="amen">${l.amen.map(a=>`<span>${a}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+
+  const emptyState=visibleLounges.length===0?`<div class="empty" style="margin-top:0">
+    <div class="ei">${svgIcon('lounge')}</div>
+    <h3>No lounges here</h3>
+    <p>The selected card${relevantCards.length>1?'s':''} don't have access in this region.</p>
+  </div>`:'';
+
+  const totalAirports=[...new Set(visibleLounges.map(l=>l.code))].length;
 
   return `<div class="page map-page">
     <div class="page-head">
       <button class="map-back" data-action="map-back">← Back</button>
       <div class="eyebrow">Lounge Access · Global Network</div>
       <h1 class="title">Where your card <em>opens doors</em></h1>
-      <p class="lede">Partner lounges across ${LOUNGES.length} airports worldwide, anchored in Kuala Lumpur. Filter by region to plan your next layover in comfort.</p>
-      ${ctxBanner}
+      <p class="lede">${visibleLounges.length} lounge${visibleLounges.length!==1?'s':''} across ${totalAirports} airport${totalAirports!==1?'s':''}${relevantCards.length===1?' with the '+relevantCards[0].name:''}.</p>
     </div>
+
     <div class="worldmap">
       <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-        <g>${grid}</g><g>${arcs}</g><g>${markers}</g>
+        <g>${grid}</g>
+        <g>${arcs}</g>
+        <g>${airportMarkers}</g>
+        <g>${homeMarker}</g>
       </svg>
     </div>
-    <div class="region-bar">
-      ${REGIONS.map(r=>`<button class="rchip ${region===r.id?'active':''}" data-action="map-region" data-region="${r.id}">${r.label}</button>`).join('')}
-    </div>
-    <div class="lounge-grid">${cards}</div>
+
+    <div class="map-cards-section">${cardBanners}</div>
+
+    <div class="map-section-label">Filter by region</div>
+    <div class="region-bar">${regionChips}</div>
+
+    <div class="lounge-grid">${loungeCards}${emptyState}</div>
   </div>`;
 }
 
@@ -1136,6 +1274,16 @@ document.addEventListener('click', e=>{
       }
       render(); break;
     }
+    case 'move-cart-left':{
+      const i=state.cart.indexOf(cid);
+      if(i>0){[state.cart[i-1],state.cart[i]]=[state.cart[i],state.cart[i-1]];render();}
+      break;
+    }
+    case 'move-cart-right':{
+      const i=state.cart.indexOf(cid);
+      if(i>-1&&i<state.cart.length-1){[state.cart[i+1],state.cart[i]]=[state.cart[i],state.cart[i+1]];render();}
+      break;
+    }
     case 'remove-cart-card':{
       const i=state.cart.indexOf(cid);
       if(i>-1) state.cart.splice(i,1);
@@ -1152,15 +1300,18 @@ document.addEventListener('click', e=>{
       render(); break;
     }
     case 'open-map':
-      state.mapReturn='cart'; state.mapCard=null; state.mapRegion='all'; state.page='map';
+      state.mapReturn='cart'; state.mapCard=null; state.mapRegion=''; state.mapActiveCard=null; state.page='map';
       posthog.capture('lounge_map_opened',{source:'compare_table'});
       render(true); break;
     case 'open-map-card':
-      state.mapReturn='listing'; state.mapCard=cid; state.mapRegion='all'; state.page='map';
+      state.mapReturn='listing'; state.mapCard=cid; state.mapRegion=''; state.mapActiveCard=null; state.page='map';
       posthog.capture('lounge_map_opened',{source:'card_listing',card_id:cid,card_name:CARD(cid)?.name});
       render(true); break;
+    case 'map-filter-card':
+      state.mapActiveCard = t.dataset.card || null;
+      render(); break;
     case 'map-region':
-      state.mapRegion=t.dataset.region;
+      state.mapRegion = state.mapRegion===t.dataset.region ? '' : t.dataset.region;
       posthog.capture('lounge_region_filtered',{region:t.dataset.region});
       render(); break;
     case 'map-back': state.page=state.mapReturn||'listing'; render(true); break;
@@ -1170,4 +1321,4 @@ document.addEventListener('click', e=>{
 loadData();
 </script>
 </body>
-</html>
+</html>>
