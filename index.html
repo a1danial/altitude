@@ -163,9 +163,9 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   table.cmp{border-collapse:separate;border-spacing:0;width:100%;min-width:680px}
   table.cmp th,table.cmp td{text-align:left;vertical-align:top}
   table.cmp thead th{position:sticky;top:0;z-index:5;background:var(--bg);padding-bottom:14px}
-  .col-feat{position:sticky;left:0;z-index:6;background:var(--bg);min-width:208px;width:208px}
+  .col-feat{position:sticky;left:0;z-index:6;background:var(--bg);min-width:160px;width:160px}
   thead .col-feat{z-index:8}
-  .ccard{width:188px;min-width:188px;padding-right:14px}
+  .ccard{width:200px;min-width:200px;padding-right:14px}
   .mini{
     position:relative;border-radius:13px;padding:15px 15px 14px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);
     box-shadow:0 14px 30px -16px rgba(0,0,0,0.8);aspect-ratio:1.6/1;display:flex;flex-direction:column;justify-content:space-between;
@@ -181,7 +181,7 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .ccard .rm{margin-top:7px;font-size:11px;letter-spacing:0.04em;color:var(--text-faint);background:none;border:1px solid var(--line-soft);padding:5px 11px;border-radius:999px;cursor:pointer;transition:.2s}
   .ccard .rm:hover{border-color:#c97a7a;color:#d99}
 
-  table.cmp tbody td,table.cmp tbody th{padding:15px 14px 15px 0;border-top:1px solid var(--line-soft)}
+  table.cmp tbody td,table.cmp tbody th{padding:15px 14px;border-top:1px solid var(--line-soft)}
   .col-feat.fcell{padding-left:0;padding-right:18px}
   .sec-row td,.sec-row th{padding-top:26px;border-top:none !important}
   .sec-row .sec-lab{font-size:11px;letter-spacing:0.26em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:12px}
@@ -281,10 +281,10 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   tr.prio-sub-last.is-prio td, tr.prio-sub-last.is-prio th{
     background:linear-gradient(90deg,rgba(201,169,106,0.16),rgba(201,169,106,0.06));
   }
-  /* Non-priority variant — plain background */
+  /* Non-priority variant — match normal non-priority cell background */
   tr.prio-sub:not(.is-prio) td, tr.prio-sub:not(.is-prio) th,
   tr.prio-sub-last:not(.is-prio) td, tr.prio-sub-last:not(.is-prio) th{
-    background:var(--bg);
+    background:var(--surface);
   }
   /* Divider on value columns only, skipping first sub-row */
   tr.prio-sub:not(.prio-sub-first) td:not(.col-feat),
