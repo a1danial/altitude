@@ -322,10 +322,13 @@ posthog.init('phc_tYiktqwxPnRMiCusmSY2upXERxftpCVRrMkZbfvVAsyZ',{api_host:'https
   .sv{font-size:13px;color:var(--text-dim);font-weight:300;line-height:1.45;padding:0;margin:0;display:block}
   .sv.na{color:var(--text-faint);font-style:italic}
   .sv.uw{font-size:11.5px;color:var(--text-faint);font-weight:300}
-  /* Priority rows — match tr.prio-row td .cell-yes .det warm white */
-  tr.is-prio .sv{color:rgba(236,231,221,0.85)}
-  tr.is-prio .sv.na{color:rgba(201,169,106,0.35)}
-  tr.is-prio .sv.uw{color:rgba(201,169,106,0.45);font-size:11.5px}
+  /* Priority rows — mirror tr.prio-row td .cell-yes .det exactly */
+  tr.prio-sub.is-prio td .sv,
+  tr.prio-sub-last.is-prio td .sv{color:rgba(236,231,221,0.8)}
+  tr.prio-sub.is-prio td .sv.na,
+  tr.prio-sub-last.is-prio td .sv.na{color:rgba(201,169,106,0.3)}
+  tr.prio-sub.is-prio td .sv.uw,
+  tr.prio-sub-last.is-prio td .sv.uw{color:rgba(201,169,106,0.45)}
   .sv-bullet{display:flex;align-items:baseline;gap:6px;font-size:13px;color:var(--text-dim);font-weight:300;line-height:1.45}
   .sv-bullet::before{content:"·";color:var(--gold);font-weight:700;flex-shrink:0}
 
