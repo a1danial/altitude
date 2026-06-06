@@ -1,15 +1,6 @@
-'use client';
-
-import { useStore } from '@/lib/store';
-import { PerkCard } from '@/components/PerkCard';
-import { PrioritySidebar } from '@/components/PrioritySidebar';
+import PerkGrid from '@/components/PerkGrid';
 
 export default function ProfilePage() {
-  const perks = useStore(s => s.perks);
-  const selected = useStore(s => s.selected);
-  const sorted = [...perks].sort((a, b) => a.pop - b.pop);
-  const hasSide = selected.length > 0;
-
   return (
     <div className="page">
       <div className="page-head">
@@ -25,14 +16,7 @@ export default function ProfilePage() {
         <span className="lab">Sorted by popularity</span>
         <span className="ln" />
       </div>
-      <div className={`profile-grid${hasSide ? ' has-side' : ''}`}>
-        <div className="perks">
-          {sorted.map((p, i) => (
-            <PerkCard key={p.id} p={p} index={i} />
-          ))}
-        </div>
-        {hasSide && <PrioritySidebar />}
-      </div>
+      <PerkGrid />
     </div>
   );
 }
