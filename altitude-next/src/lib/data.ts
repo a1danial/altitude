@@ -62,6 +62,8 @@ export interface Lounge {
   cards?: string[];
   lon?: number;
   lat?: number;
+  airport?: string;
+  country?: string;
 }
 
 export interface Hub {

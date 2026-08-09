@@ -25,7 +25,7 @@ export function CardRow({ c, top, index }: Props) {
   const open = expanded.includes(c.id);
 
   function openMapCard() {
-    setMapConfig({ mapReturn: '/cards', mapCard: c.id, mapRegion: '', mapActiveCard: null });
+    setMapConfig({ mapReturn: '/cards', mapCard: c.id, mapRegion: '', mapActiveCard: c.id });
     router.push('/map');
   }
 

@@ -49,16 +49,16 @@ export function transformCards(records: AirtableRecord[]): Card[] {
         visits:    (f.lounge_visits    as string) ?? null,
         access:    (f.lounge_access    as string) ?? null,
         condition: (f.lounge_condition as string) ?? null,
-        lounges:   (f.lounge_lounges   as string) ?? null,
+        lounges:   (f.lounge_network   as string) ?? null,
       };
     }
 
     perks.insurance = {
-      disruptions: (f['insurance_disruptions'] as string) ?? null,
-      medical:     (f['insurance_medical']     as string) ?? null,
-      accident:    (f['insurance_accident']    as string) ?? null,
-      condition:   (f['insurance_condition']   as string) ?? null,
-      underwriter: (f['insurance_underwriter'] as string) ?? null,
+      disruptions: (f['travel_insurance_disruptions'] as string) ?? null,
+      medical:     (f['travel_insurance_medical']     as string) ?? null,
+      accident:    (f['travel_insurance_accident']    as string) ?? null,
+      condition:   (f['travel_insurance_condition']   as string) ?? null,
+      underwriter: (f['travel_insurance_underwriter'] as string) ?? null,
     };
 
     /* note: overseas is stored as "overseas+" in some Airtable bases */
@@ -74,20 +74,17 @@ export function transformCards(records: AirtableRecord[]): Card[] {
     perks.wifi          = (f['wifi']           as string | null) ?? null;
     perks.protection    = (f['protection']     as string | null) ?? null;
 
-    /* derive slug id from card name — Airtable's own id field is ignored */
-    const slugId = String(f.name ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
-
     return {
-      id:        slugId,
-      name:      String(f.name      ?? ''),
+      id:        String(f.card_id   ?? r.id),
+      name:      String(f.card_name ?? ''),
       tier:      String(f.tier      ?? ''),
       net:       String(f.net       ?? ''),
       num:       String(f.num       ?? ''),
       theme:     String(f.theme     ?? ''),
       fg:        String(f.fg        ?? ''),
-      minSalary: Number(f.minSalary ?? 0),
-      fee:       Number(f.fee       ?? 0),
-      waiver:    String(f.waiver    ?? ''),
+      minSalary: Number(f.min_income ?? 0),
+      fee:       Number(f.annual_fee ?? 0),
+      waiver:    String(f.annual_fee_details ?? ''),
       perks,
     };
   });
@@ -97,17 +94,35 @@ export function transformLounges(records: AirtableRecord[]): Lounge[] {
   return records.map(r => {
     const f = r.fields as Record<string, unknown>;
     return {
-      id:     String(f.id ?? r.id),
-      code:   String(f.code   ?? ''),
-      city:   String(f.city   ?? ''),
-      name:   String(f.name   ?? ''),
-      term:   String(f.term   ?? ''),
-      net:    String(f.net    ?? ''),
-      region: String(f.region ?? ''),
-      lon:    parseFloat(String(f.lon ?? '0')) || 0,
-      lat:    parseFloat(String(f.lat ?? '0')) || 0,
-      amen:   String(f.amen  ?? '').split('|').map(s => s.trim()).filter(Boolean),
-      cards:  String(f.cards ?? '').split('|').map(s => s.trim()).filter(Boolean),
+      id:      String(f.lounge_id   ?? r.id),
+      code:    String(f.airport_code ?? ''),
+      city:    String(f.city         ?? ''),
+      name:    String(f.lounge_name  ?? ''),
+      term:    String(f.location     ?? ''),
+      airport: String(f.airport      ?? ''),
+      country: String(f.country      ?? ''),
+      net:     String(f.net          ?? ''),
+      region:  String(f.region       ?? ''),
+      lon:     parseFloat(String(f.lon ?? '')),
+      lat:     parseFloat(String(f.lat ?? '')),
+      amen:    String(f.amen ?? '').split('|').map(s => s.trim()).filter(Boolean),
+      cards:   [],
     };
   });
+}
+
+export interface LoungeAccess {
+  cardId: string;
+  loungeId: string;
+  entitlement: string;
+}
+
+export function transformLoungeAccess(records: AirtableRecord[]): LoungeAccess[] {
+  return records
+    .map(r => ({
+      cardId:      String(r.fields.card_id     ?? ''),
+      loungeId:    String(r.fields.lounge_id   ?? ''),
+      entitlement: String(r.fields.entitlement ?? ''),
+    }))
+    .filter(a => a.cardId && a.loungeId);
 }

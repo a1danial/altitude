@@ -1,18 +1,22 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/Icon';
-import { LoungeCard } from '@/components/LoungeCard';
+import { LoungeMap } from '@/components/LoungeMap';
 import { useStore } from '@/lib/store';
-import { REGIONS, HOME_HUB } from '@/lib/data';
+import { REGIONS } from '@/lib/data';
+import type { Card, Lounge } from '@/lib/data';
 
-const W = 900;
-const H = 400;
+function hasCoords(l: Lounge): boolean {
+  return Number.isFinite(l.lon) && Number.isFinite(l.lat);
+}
 
 export default function MapPage() {
   const router = useRouter();
   const cards = useStore(s => s.cards);
   const lounges = useStore(s => s.lounges);
+  const entitlements = useStore(s => s.entitlements);
   const mapCard = useStore(s => s.mapCard);
   const mapRegion = useStore(s => s.mapRegion);
   const mapActiveCard = useStore(s => s.mapActiveCard);
@@ -21,70 +25,66 @@ export default function MapPage() {
   const setMapActiveCard = useStore(s => s.setMapActiveCard);
   const setMapRegion = useStore(s => s.setMapRegion);
 
-  const relevantCardIds = mapCard
-    ? [mapCard]
-    : cart.length ? cart : cards.map(c => c.id);
+  /* Which cards this visit is scoped to — one card, the comparison cart, or
+     every card that actually carries a lounge benefit. */
+  const relevantCards = useMemo<Card[]>(() => {
+    if (mapCard) return cards.filter(c => c.id === mapCard);
+    if (cart.length) return cards.filter(c => cart.includes(c.id));
+    return cards.filter(c => c.perks.lounge);
+  }, [cards, cart, mapCard]);
 
-  const relevantCards = relevantCardIds
-    .map(id => cards.find(c => c.id === id))
-    .filter((c): c is typeof cards[0] => c != null);
+  const relevantCardIds = useMemo(() => relevantCards.map(c => c.id), [relevantCards]);
 
-  const relevantLounges = lounges.filter(l => l.cards?.some(cid => relevantCardIds.includes(cid)));
-  const visibleLounges = relevantLounges
-    .filter(l => !mapActiveCard || l.cards?.includes(mapActiveCard))
-    .filter(l => !mapRegion || l.region === mapRegion);
+  const mappable = useMemo(() => lounges.filter(hasCoords), [lounges]);
 
-  /* Smart viewport bounds */
-  const boundsPoints = [
-    HOME_HUB,
-    ...(visibleLounges.length ? visibleLounges : relevantLounges)
-      .map(l => ({ lon: l.lon ?? HOME_HUB.lon, lat: l.lat ?? HOME_HUB.lat })),
-  ];
-  let minLon = Math.min(...boundsPoints.map(p => p.lon));
-  let maxLon = Math.max(...boundsPoints.map(p => p.lon));
-  let minLat = Math.min(...boundsPoints.map(p => p.lat));
-  let maxLat = Math.max(...boundsPoints.map(p => p.lat));
-  const padLon = Math.max((maxLon - minLon) * 0.3, 14);
-  const padLat = Math.max((maxLat - minLat) * 0.36, 12);
-  minLon = Math.max(minLon - padLon, -175);
-  maxLon = Math.min(maxLon + padLon, 175);
-  minLat = Math.max(minLat - padLat, -60);
-  maxLat = Math.min(maxLat + padLat, 75);
+  /* Every lounge reachable by the scoped cards. */
+  const inNetwork = useMemo(
+    () => mappable.filter(l => l.cards?.some(id => relevantCardIds.includes(id))),
+    [mappable, relevantCardIds],
+  );
 
-  const proj = (lon: number, lat: number): [number, number] => [
-    (lon - minLon) / (maxLon - minLon) * W,
-    (maxLat - lat) / (maxLat - minLat) * H,
-  ];
+  const loungeCountFor = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const l of inNetwork) {
+      for (const id of l.cards ?? []) {
+        if (relevantCardIds.includes(id)) counts.set(id, (counts.get(id) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [inNetwork, relevantCardIds]);
 
-  /* Grid lines */
-  const gridLines: React.ReactNode[] = [];
-  const gStep = (maxLon - minLon) > 80 ? 30 : 15;
-  for (let lon = Math.ceil(minLon / gStep) * gStep; lon <= maxLon; lon += gStep) {
-    const [x] = proj(lon, 0);
-    if (x >= 0 && x <= W) gridLines.push(
-      <line key={`v${lon}`} x1={x.toFixed(1)} y1="0" x2={x.toFixed(1)} y2={H} className="grid" />
-    );
-  }
-  for (let lat = Math.ceil(minLat / gStep) * gStep; lat <= maxLat; lat += gStep) {
-    const [, y] = proj(0, lat);
-    if (y >= 0 && y <= H) gridLines.push(
-      <line key={`h${lat}`} x1="0" y1={y.toFixed(1)} x2={W} y2={y.toFixed(1)} className="grid" />
-    );
-  }
+  /* The map ignores the region filter — region only narrows the list below it. */
+  const accessible = useMemo(
+    () => (mapActiveCard ? inNetwork.filter(l => l.cards?.includes(mapActiveCard)) : inNetwork),
+    [inNetwork, mapActiveCard],
+  );
 
-  const [hx, hy] = proj(HOME_HUB.lon, HOME_HUB.lat);
+  const isAccessible = (l: Lounge) => !mapActiveCard || !!l.cards?.includes(mapActiveCard);
 
-  /* Airport clusters from visible lounges */
-  const airportMap: Record<string, { lon: number; lat: number; code: string; count: number }> = {};
-  visibleLounges.forEach(l => {
-    if (!airportMap[l.code]) airportMap[l.code] = { lon: l.lon ?? HOME_HUB.lon, lat: l.lat ?? HOME_HUB.lat, code: l.code, count: 0 };
-    airportMap[l.code].count++;
-  });
-  const airports = Object.values(airportMap);
+  const regional = useMemo(
+    () => (mapRegion ? inNetwork.filter(l => l.region === mapRegion) : inNetwork),
+    [inNetwork, mapRegion],
+  );
 
-  const activeRegions = [...new Set(relevantLounges.map(l => l.region))];
-  const totalAirports = [...new Set(visibleLounges.map(l => l.code))].length;
-  const multiCard = relevantCards.length > 1;
+  /* Accessible lounges float to the top; the rest stay visible but dimmed. */
+  const listed = useMemo(() => {
+    if (!mapActiveCard) return regional;
+    const reach = (l: Lounge) => Number(!!l.cards?.includes(mapActiveCard));
+    return [...regional].sort((a, b) => reach(b) - reach(a));
+  }, [regional, mapActiveCard]);
+
+  const activeRegions = useMemo(
+    () => new Set(inNetwork.map(l => l.region)),
+    [inNetwork],
+  );
+
+  const accessibleCount = listed.filter(isAccessible).length;
+  const airportCount = new Set(accessible.map(l => l.code)).size;
+  const showAllTile = relevantCards.length > 1;
+
+  const countLabel = mapActiveCard
+    ? `${accessibleCount} of ${listed.length} lounge${listed.length !== 1 ? 's' : ''} accessible`
+    : `${listed.length} lounge${listed.length !== 1 ? 's' : ''}`;
 
   return (
     <div className="page map-page">
@@ -95,85 +95,81 @@ export default function MapPage() {
         <div className="eyebrow">Lounge Access · Global Network</div>
         <h1 className="title">Where your card <em>opens doors</em></h1>
         <p className="lede">
-          {visibleLounges.length} lounge{visibleLounges.length !== 1 ? 's' : ''} across{' '}
-          {totalAirports} airport{totalAirports !== 1 ? 's' : ''}
-          {relevantCards.length === 1 ? ' with the ' + relevantCards[0].name : ''}.
+          {accessible.length} lounge{accessible.length !== 1 ? 's' : ''} across{' '}
+          {airportCount} airport{airportCount !== 1 ? 's' : ''}
+          {relevantCards.length === 1 ? ` with the ${relevantCards[0].name}` : ''}. Select a card to
+          filter, then narrow by region.
         </p>
       </div>
 
-      <div className="worldmap">
-        <svg viewBox={`0 0 ${W} ${H}`} xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-          <g>{gridLines}</g>
-          <g>
-            {airports.map((a, i) => {
-              const [x, y] = proj(a.lon, a.lat);
-              const mx = (hx + x) / 2;
-              const my = (hy + y) / 2 - Math.hypot(x - hx, y - hy) * 0.22;
-              return (
-                <path
-                  key={a.code}
-                  className="arc"
-                  style={{ animationDelay: `${i * 130}ms` }}
-                  d={`M${hx.toFixed(1)} ${hy.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`}
-                />
-              );
-            })}
-          </g>
-          <g>
-            {airports.map((a, i) => {
-              const [x, y] = proj(a.lon, a.lat);
-              const r = 5 + Math.min(a.count, 3) * 1.5;
-              return (
-                <g key={a.code} className="mk lounge-mk" style={{ animationDelay: `${200 + i * 80}ms` }}>
-                  <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r={r} className="lounge-dot" />
-                  <text x={x.toFixed(1)} y={(y - r - 6).toFixed(1)} className="lab">{a.code}</text>
-                </g>
-              );
-            })}
-          </g>
-          <g className="mk home">
-            <circle cx={hx.toFixed(1)} cy={hy.toFixed(1)} r="18" className="pulse" />
-            <circle cx={hx.toFixed(1)} cy={hy.toFixed(1)} r="7" className="home-dot" />
-            <text x={hx.toFixed(1)} y={(hy - 16).toFixed(1)} className="home-lab">{HOME_HUB.code}</text>
-          </g>
-        </svg>
-      </div>
+      <LoungeMap lounges={accessible} fit={mapActiveCard != null} />
 
-      <div className="map-cards-section">
-        {relevantCards.map(c => {
-          const isActive = mapActiveCard === c.id;
-          const cardLounges = lounges.filter(l => l.cards?.includes(c.id) && relevantCardIds.includes(c.id));
-          const nextCard = isActive ? null : c.id;
-          return (
+      <div className="card-filter-scroll">
+        <div className="card-filter-row">
+          {showAllTile && (
             <div
-              key={c.id}
-              className={`map-card-banner${multiCard ? ' clickable' : ''}${isActive ? ' active-banner' : ''}`}
-              onClick={multiCard ? () => setMapActiveCard(nextCard) : undefined}
+              className={`cf-item${mapActiveCard == null ? ' active' : ''}`}
+              onClick={() => setMapActiveCard(null)}
             >
-              <div className="mcb-card" style={{ background: c.theme, color: c.fg }}>
-                <div className="mcb-card-top">
-                  <div className="chip" />
-                  <div className="mcb-net">{c.net}</div>
+              <div className="cf-card cf-all">
+                <div className="cf-all-stack">
+                  {relevantCards.slice(0, 3).map((c, i) => (
+                    <div key={c.id} className={`cas cas-${i}`} style={{ background: c.theme }} />
+                  ))}
                 </div>
-                <div>
-                  <div className="mcb-tier">{c.tier}</div>
-                  <div className="mcb-cname">{c.name}</div>
+                <div className="cf-info">
+                  <div className="cf-name">All cards</div>
+                  <div className="cf-access">
+                    {relevantCards.length} cards · {inNetwork.length} lounges
+                  </div>
                 </div>
-              </div>
-              <div className="mcb-info">
-                <div className="mcb-name">{c.name}</div>
-                <div className="mcb-meta">{c.perks.lounge ? c.perks.lounge.visits : '—'}</div>
-                <div className="mcb-meta">{cardLounges.length} lounge{cardLounges.length !== 1 ? 's' : ''} in network</div>
-                {multiCard && <div className="mcb-hint">{isActive ? '↩ Show all cards' : 'Tap to filter map'}</div>}
               </div>
             </div>
-          );
-        })}
+          )}
+
+          {relevantCards.map(c => {
+            const count = loungeCountFor.get(c.id) ?? 0;
+            const active = mapActiveCard === c.id;
+            return (
+              <div
+                key={c.id}
+                className={`cf-item${active ? ' active' : ''}`}
+                onClick={() => setMapActiveCard(active && showAllTile ? null : c.id)}
+              >
+                <div className="cf-card">
+                  <div className="cf-mini" style={{ background: c.theme, color: c.fg }}>
+                    <div className="cf-mini-top">
+                      <div className="cm-chip" />
+                      <div className="cm-net">{c.net}</div>
+                    </div>
+                    <div className="cm-name">{c.name}</div>
+                  </div>
+                  <div className="cf-info">
+                    <div className="cf-name">{c.name}</div>
+                    <div className="cf-access">
+                      <b>{count} lounge{count !== 1 ? 's' : ''}</b>
+                      {c.perks.lounge?.visits ? ` · ${c.perks.lounge.visits}` : ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="map-section-label">Filter by region</div>
+      <div className="section-rule">
+        <span className="sr-lab">Region</span>
+        <span className="sr-ln" />
+      </div>
       <div className="region-bar">
-        {REGIONS.filter(r => activeRegions.includes(r.id)).map(r => (
+        <button
+          className={`rchip${mapRegion === '' ? ' active' : ''}`}
+          onClick={() => setMapRegion('')}
+        >
+          All regions
+        </button>
+        {REGIONS.filter(r => activeRegions.has(r.id)).map(r => (
           <button
             key={r.id}
             className={`rchip${mapRegion === r.id ? ' active' : ''}`}
@@ -184,15 +180,46 @@ export default function MapPage() {
         ))}
       </div>
 
+      <div className="section-rule">
+        <span className="sr-lab">{countLabel}</span>
+        <span className="sr-ln" />
+      </div>
+
       <div className="lounge-grid">
-        {visibleLounges.map((l, i) => (
-          <LoungeCard key={`${l.code}-${l.term}`} l={l} index={i} />
-        ))}
-        {visibleLounges.length === 0 && (
+        {listed.map((l, i) => {
+          const open = isAccessible(l);
+          const entitlement = mapActiveCard
+            ? entitlements[`${mapActiveCard}|${l.id}`]
+            : undefined;
+          return (
+            <div
+              key={l.id ?? `${l.code}-${l.term}`}
+              className={`lcard2${open ? '' : ' dimmed'}`}
+              style={{ animationDelay: `${Math.min(i, 20) * 35}ms` }}
+            >
+              <div className="l2top">
+                <div className="code">{l.code}</div>
+                {l.net && <div className="net2">{l.net}</div>}
+              </div>
+              <h3>{l.name}</h3>
+              <div className="city">{[l.city, l.country].filter(Boolean).join(' · ')}</div>
+              <div className="term">{l.term}</div>
+              <div className="amen">
+                {entitlement && <span>{entitlement}</span>}
+                {l.amen.map(a => <span key={a}>{a}</span>)}
+              </div>
+            </div>
+          );
+        })}
+        {listed.length === 0 && (
           <div className="empty" style={{ marginTop: 0 }}>
             <div className="ei"><Icon id="lounge" /></div>
             <h3>No lounges here</h3>
-            <p>The selected card{relevantCards.length > 1 ? 's' : ''} don't have access in this region.</p>
+            <p>
+              {inNetwork.length === 0
+                ? 'No lounge access is mapped to the selected card yet.'
+                : 'No lounges in this region for the selected card.'}
+            </p>
           </div>
         )}
       </div>

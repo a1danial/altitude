@@ -7,7 +7,13 @@ import {
   type Card,
   type Lounge,
 } from './data';
-import { atFetchAll, transformPerks, transformCards, transformLounges } from './airtable';
+import {
+  atFetchAll,
+  transformPerks,
+  transformCards,
+  transformLounges,
+  transformLoungeAccess,
+} from './airtable';
 
 export type DataStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -16,6 +22,8 @@ interface StoreState {
   perks: Perk[];
   cards: Card[];
   lounges: Lounge[];
+  /* per card+lounge entitlement, keyed `${cardId}|${loungeId}` */
+  entitlements: Record<string, string>;
   dataStatus: DataStatus;
   loadData(): Promise<void>;
 
@@ -47,21 +55,39 @@ export const useStore = create<StoreState>((set, get) => ({
   perks: STATIC_PERKS,
   cards: STATIC_CARDS,
   lounges: STATIC_LOUNGES,
+  entitlements: {},
   dataStatus: 'idle',
 
   async loadData() {
     if (get().dataStatus !== 'idle') return;
     set({ dataStatus: 'loading' });
     try {
-      const [perkRecs, cardRecs, loungeRecs] = await Promise.all([
+      const [perkRecs, cardRecs, loungeRecs, accessRecs] = await Promise.all([
         atFetchAll('Perks'),
         atFetchAll('Cards'),
         atFetchAll('Lounges'),
+        atFetchAll('LoungebyCard'),
       ]);
+
+      const lounges = transformLounges(loungeRecs);
+      const access = transformLoungeAccess(accessRecs);
+
+      /* LoungebyCard is the join table: fan it out onto each lounge */
+      const cardsByLounge = new Map<string, string[]>();
+      const entitlements: Record<string, string> = {};
+      for (const a of access) {
+        const list = cardsByLounge.get(a.loungeId);
+        if (list) list.push(a.cardId);
+        else cardsByLounge.set(a.loungeId, [a.cardId]);
+        if (a.entitlement) entitlements[`${a.cardId}|${a.loungeId}`] = a.entitlement;
+      }
+      for (const l of lounges) l.cards = cardsByLounge.get(l.id ?? '') ?? [];
+
       set({
         perks:      transformPerks(perkRecs),
         cards:      transformCards(cardRecs),
-        lounges:    transformLounges(loungeRecs),
+        lounges,
+        entitlements,
         dataStatus: 'ready',
       });
     } catch {
