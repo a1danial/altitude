@@ -49,7 +49,7 @@ export function transformCards(records: AirtableRecord[]): Card[] {
         visits:    (f.lounge_visits    as string) ?? null,
         access:    (f.lounge_access    as string) ?? null,
         condition: (f.lounge_condition as string) ?? null,
-        lounges:   (f.lounge_network   as string) ?? null,
+        network:   (f.lounge_network   as string) ?? null,
       };
     }
 
@@ -75,16 +75,16 @@ export function transformCards(records: AirtableRecord[]): Card[] {
     perks.protection    = (f['protection']     as string | null) ?? null;
 
     return {
-      id:        String(f.card_id   ?? r.id),
-      name:      String(f.card_name ?? ''),
-      tier:      String(f.tier      ?? ''),
-      net:       String(f.net       ?? ''),
-      num:       String(f.num       ?? ''),
-      theme:     String(f.theme     ?? ''),
-      fg:        String(f.fg        ?? ''),
-      minSalary: Number(f.min_income ?? 0),
-      fee:       Number(f.annual_fee ?? 0),
-      waiver:    String(f.annual_fee_details ?? ''),
+      id:                 String(f.card_id   ?? r.id),
+      card_name:          String(f.card_name ?? ''),
+      tier:               String(f.tier      ?? ''),
+      net:                String(f.net       ?? ''),
+      num:                String(f.num       ?? ''),
+      theme:              String(f.theme     ?? ''),
+      fg:                 String(f.fg        ?? ''),
+      min_income:         Number(f.min_income ?? 0),
+      annual_fee:         Number(f.annual_fee ?? 0),
+      annual_fee_details: String(f.annual_fee_details ?? ''),
       perks,
     };
   });
@@ -94,19 +94,20 @@ export function transformLounges(records: AirtableRecord[]): Lounge[] {
   return records.map(r => {
     const f = r.fields as Record<string, unknown>;
     return {
-      id:      String(f.lounge_id   ?? r.id),
-      code:    String(f.airport_code ?? ''),
-      city:    String(f.city         ?? ''),
-      name:    String(f.lounge_name  ?? ''),
-      term:    String(f.location     ?? ''),
-      airport: String(f.airport      ?? ''),
-      country: String(f.country      ?? ''),
-      net:     String(f.net          ?? ''),
-      region:  String(f.region       ?? ''),
-      lon:     parseFloat(String(f.lon ?? '')),
-      lat:     parseFloat(String(f.lat ?? '')),
-      amen:    String(f.amen ?? '').split('|').map(s => s.trim()).filter(Boolean),
-      cards:   [],
+      id:           String(f.lounge_id    ?? r.id),
+      airport_code: String(f.airport_code ?? ''),
+      city:         String(f.city         ?? ''),
+      lounge_name:  String(f.lounge_name  ?? ''),
+      location:     String(f.location     ?? ''),
+      airport:      String(f.airport      ?? ''),
+      country:      String(f.country      ?? ''),
+      net:          String(f.net          ?? ''),
+      region:       String(f.region       ?? ''),
+      lon:          parseFloat(String(f.lon ?? '')),
+      lat:          parseFloat(String(f.lat ?? '')),
+      amen:         String(f.amen ?? '').split('|').map(s => s.trim()).filter(Boolean),
+      /* not an Airtable field — populated from the LoungebyCard join in store.loadData */
+      cards:        [],
     };
   });
 }

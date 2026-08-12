@@ -23,7 +23,7 @@ function buildGeoJSON(lounges: Lounge[]): LoungeCollection {
     features: lounges.map(l => ({
       type: 'Feature',
       geometry: { type: 'Point', coordinates: [l.lon as number, l.lat as number] },
-      properties: { id: l.id, code: l.code, name: l.name, term: l.term },
+      properties: { id: l.id, airport_code: l.airport_code, lounge_name: l.lounge_name, location: l.location },
     })),
   };
 }
@@ -68,13 +68,13 @@ function popupContent(props: Record<string, unknown>): HTMLElement {
   const el = document.createElement('div');
   const code = document.createElement('div');
   code.className = 'popup-code';
-  code.textContent = String(props.code ?? '');
+  code.textContent = String(props.airport_code ?? '');
   const name = document.createElement('div');
   name.className = 'popup-name';
-  name.textContent = String(props.name ?? '');
+  name.textContent = String(props.lounge_name ?? '');
   const term = document.createElement('div');
   term.className = 'popup-term';
-  term.textContent = String(props.term ?? '');
+  term.textContent = String(props.location ?? '');
   el.append(code, name, term);
   return el;
 }
