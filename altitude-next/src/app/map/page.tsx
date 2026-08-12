@@ -79,7 +79,7 @@ export default function MapPage() {
   );
 
   const accessibleCount = listed.filter(isAccessible).length;
-  const airportCount = new Set(accessible.map(l => l.code)).size;
+  const airportCount = new Set(accessible.map(l => l.airport_code)).size;
   const showAllTile = relevantCards.length > 1;
 
   const countLabel = mapActiveCard
@@ -97,7 +97,7 @@ export default function MapPage() {
         <p className="lede">
           {accessible.length} lounge{accessible.length !== 1 ? 's' : ''} across{' '}
           {airportCount} airport{airportCount !== 1 ? 's' : ''}
-          {relevantCards.length === 1 ? ` with the ${relevantCards[0].name}` : ''}. Select a card to
+          {relevantCards.length === 1 ? ` with the ${relevantCards[0].card_name}` : ''}. Select a card to
           filter, then narrow by region.
         </p>
       </div>
@@ -142,10 +142,10 @@ export default function MapPage() {
                       <div className="cm-chip" />
                       <div className="cm-net">{c.net}</div>
                     </div>
-                    <div className="cm-name">{c.name}</div>
+                    <div className="cm-name">{c.card_name}</div>
                   </div>
                   <div className="cf-info">
-                    <div className="cf-name">{c.name}</div>
+                    <div className="cf-name">{c.card_name}</div>
                     <div className="cf-access">
                       <b>{count} lounge{count !== 1 ? 's' : ''}</b>
                       {c.perks.lounge?.visits ? ` · ${c.perks.lounge.visits}` : ''}
@@ -193,17 +193,17 @@ export default function MapPage() {
             : undefined;
           return (
             <div
-              key={l.id ?? `${l.code}-${l.term}`}
+              key={l.id ?? `${l.airport_code}-${l.location}`}
               className={`lcard2${open ? '' : ' dimmed'}`}
               style={{ animationDelay: `${Math.min(i, 20) * 35}ms` }}
             >
               <div className="l2top">
-                <div className="code">{l.code}</div>
+                <div className="code">{l.airport_code}</div>
                 {l.net && <div className="net2">{l.net}</div>}
               </div>
-              <h3>{l.name}</h3>
+              <h3>{l.lounge_name}</h3>
               <div className="city">{[l.city, l.country].filter(Boolean).join(' · ')}</div>
-              <div className="term">{l.term}</div>
+              <div className="term">{l.location}</div>
               <div className="amen">
                 {entitlement && <span>{entitlement}</span>}
                 {l.amen.map(a => <span key={a}>{a}</span>)}

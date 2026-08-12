@@ -210,7 +210,7 @@ export default function ComparePage() {
                       <div className="chip" />
                       <div className="mtier">{c.net}</div>
                     </div>
-                    <div className="mname">{c.name}</div>
+                    <div className="mname">{c.card_name}</div>
                   </div>
                   <div className="cmeta">
                     <div className="cmeta-btns">
@@ -239,7 +239,7 @@ export default function ComparePage() {
               </th>
               {cols.map(c => (
                 <td key={c.id}>
-                  <div className="req-val">{fmtRM(c.minSalary)}</div>
+                  <div className="req-val">{fmtRM(c.min_income)}</div>
                   <div className="req-sub">per year</div>
                 </td>
               ))}
@@ -253,8 +253,8 @@ export default function ComparePage() {
               </th>
               {cols.map(c => (
                 <td key={c.id}>
-                  <div className="req-val">{fmtRM(c.fee)}</div>
-                  {c.waiver && <div className="req-sub waiv">{c.waiver}</div>}
+                  <div className="req-val">{fmtRM(c.annual_fee)}</div>
+                  {c.annual_fee_details && <div className="req-sub waiv">{c.annual_fee_details}</div>}
                 </td>
               ))}
             </tr>

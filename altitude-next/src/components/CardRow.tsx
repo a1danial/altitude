@@ -72,7 +72,7 @@ export function CardRow({ c, top, index }: Props) {
         </div>
         <div>
           <div className="ltier">{c.tier}</div>
-          <div className="lname">{c.name}</div>
+          <div className="lname">{c.card_name}</div>
           <div className="lnum">{c.num}</div>
         </div>
       </div>
@@ -81,15 +81,15 @@ export function CardRow({ c, top, index }: Props) {
         <div>
           <div className="fi-lab"><Icon id="overseas" /> Min. Income</div>
           <div className="fi-val big">
-            {fmtRM(c.minSalary)}
+            {fmtRM(c.min_income)}
             <span className="waiv" style={{ color: 'var(--text-faint)' }}>per year</span>
           </div>
         </div>
         <div>
           <div className="fi-lab"><Icon id="protection" /> Annual Fee</div>
           <div className="fi-val big">
-            {fmtRM(c.fee)}
-            {c.waiver && <span className="waiv">{c.waiver}</span>}
+            {fmtRM(c.annual_fee)}
+            {c.annual_fee_details && <span className="waiv">{c.annual_fee_details}</span>}
           </div>
         </div>
         {perkCols}
@@ -131,7 +131,7 @@ export function CardRow({ c, top, index }: Props) {
                   <span className="t">
                     <span className="n">{p.name}</span>
                     <span className="v">{lv.visits} · {lv.access}</span>
-                    <span className="v">{lv.lounges}</span>
+                    <span className="v">{lv.network}</span>
                     <span className="v">{lv.condition ? 'Condition — ' + lv.condition : 'No spend condition'}</span>
                     <button className="map-mini" onClick={openMapCard}>
                       <Icon id="overseas" /> Lounge map
