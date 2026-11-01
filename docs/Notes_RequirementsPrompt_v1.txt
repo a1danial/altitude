@@ -1,0 +1,48 @@
+OPENING DIALOG
+- For cards section, card details are hardcoded
+-- Extract any from Airtable as long as its complete details
+
+CARD EXPLORER
+- Page
+-- Default cards: 3 only
+- Cell value
+-- Empty data handling: Show greyed "Not offered"
+--- Data value required
+-- Insurer subheaders: Hyperlink handling
+-- Annual fee subtext: Multiple line handling (i.e. /n)
+- Dialog
+-- Autocomplete: 10 Maximum autocompletes
+-- Default: Any fee, any income, empty search bar
+-- Card in card listing, long card name handling
+- VAS
+-- Multi design: DB value format handling with JSON
+--- Variant: standard, icon, button, image
+-- Image design: Fixed dimension where image will auto fits, centred to column
+-- Texts should be able to handle hyperlink, regardless of variants
+- Selected Card:
+-- Colour design handling: DB formatting to accommodate the 2 colour schemes
+--- Single colour with a sheen, e.g.: linear-gradient(135deg, rgba(R,G,B,0) 0%, rgba(R,G,B,α) 50%, rgba(R,G,B,0) 100%), #BASE
+--- Two-colour blend, e.g.: linear-gradient(135deg, #START 0%, #END 100%)
+
+CARD DIALOG
+- Dialog
+-- Autocomplete: 10 Maximum autocompletes
+-- Default: Any fee, any income, empty search bar
+-- Card in card listing, long card name handling
+- Design should apply to both Card and Lounge pages
+- Hardcode fallbacks for card explorer should airtable fail to provide
+- Config file
+-- This is like a feature flag embedded within the code itself
+-- Create a config option where I can list the 5 card_id (e.g. cimb_travel_platinum) which will show the 5 cards in the directory
+-- Create another config (required) will be the fallback should airtable fail so what details are required/hardcoded 
+- For invite only cards: Always show card regardless of income slider setting
+
+
+
+NAV
+- Maintain preferred card and destination throughout the session
+-- So cards selected in one page, should automatically show up in the other
+
+DATABASE (Airtable)
+- card_name field values shall exclude bank name moving forward so "Maybank Visa Infinite" will be "Vise Infinite". This is to optimise bank field.
+- there is a special handling case for invite only cards which require min_income to be blank and invitation_only to be true, and whilst great care has taken place to ensure a clean data, best we also have a redundant backup here to handling violation of this case. In that case, UI should show error.
