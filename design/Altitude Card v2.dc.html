@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+&lt;!-- @template name="Altitude Compare v2" description="Ranked card grid — sectioned comparison table with a card-selector modal" --&gt;
+<helmet>
+<script src="./ds-base.js"></script>
+<script src="./altitude-data-v2.js"></script>
+<script src="./image-slot.js"></script>
+<style>::placeholder{color:var(--text-dim);opacity:0.95}</style>
+</helmet>
+<div style="position:relative;min-height:100vh;background:var(--bg);display:flex;flex-direction:column">
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:var(--gradient-atmosphere)"></div>
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.04;background-image:var(--noise-svg)"></div>
+
+<main style="position:relative;z-index:1;flex:1;max-width:{{ mainMaxWidth }};width:100%;margin:0 auto;padding:{{ mainPadding }};box-sizing:border-box">
+<div>
+<h1 style="font-family:var(--font-serif);font-weight:400;font-size:{{ titleFontSize }};line-height:1.1;letter-spacing:-0.01em;margin:0;color:var(--text)">Which card actually <em style="font-style:italic;color:var(--gold-bright)">works for your travel?</em></h1>
+<p style="color: var(--text-dim); font-size: {{ subtextFontSize }}; line-height: 1.6; margin: 12px 0 0; font-weight: 300; margin-bottom: 12px">Select your primary travel priorities below. We'll surface the cards that excel where you need them most.</p>
+</div>
+
+<sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px;padding-bottom:24px">
+
+<div style="display:flex;flex-direction:column;gap:6px;padding:2px 0 6px">
+<div style="display:flex;gap:6px;margin-right:16px">
+<button onclick="{{ mobileDialogBtn.onClick }}" style="flex:1;min-width:0;min-height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:var(--font-sans);font-size:11px;letter-spacing:0.16em;text-transform:uppercase;font-weight:500;color:var(--gold);background:rgba(201,169,106,0.05);border:1px solid var(--gold);padding:8px;border-radius:11px;cursor:pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.2"></rect><line x1="3" y1="10.5" x2="21" y2="10.5"></line></svg>
+Select card</button>
+<sc-for list="{{ mobileTilesRow1 }}" as="t" hint-placeholder-count="2">
+<button onclick="{{ t.onClick }}" style="flex:1;min-width:0;min-height:78px;border-radius:11px;padding:10px;position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3px;cursor:pointer;text-align:left;font-family:var(--font-sans);background:{{ t.bg }};border:{{ t.border }};color:{{ t.fg }};overflow:hidden">
+<sc-if value="{{ t.filled }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+<span style="font-family:var(--font-serif);font-size:18px;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.card_name }}</span>
+<span style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.bank }}</span>
+</div>
+</sc-if>
+<sc-if value="{{ t.empty }}" hint-placeholder-val="{{ false }}">
+<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.2"></rect><line x1="3" y1="10.5" x2="21" y2="10.5"></line></svg>
+<span style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase">Add</span>
+</div>
+</sc-if>
+</button>
+</sc-for>
+</div>
+<div style="display:flex;gap:6px;margin-left:16px">
+<sc-for list="{{ mobileTilesRow2 }}" as="t" hint-placeholder-count="3">
+<button onclick="{{ t.onClick }}" style="flex:1;min-width:0;min-height:78px;border-radius:11px;padding:10px;position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3px;cursor:pointer;text-align:left;font-family:var(--font-sans);background:{{ t.bg }};border:{{ t.border }};color:{{ t.fg }};overflow:hidden">
+<sc-if value="{{ t.filled }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+<span style="font-family:var(--font-serif);font-size:18px;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.card_name }}</span>
+<span style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.bank }}</span>
+</div>
+</sc-if>
+<sc-if value="{{ t.empty }}" hint-placeholder-val="{{ false }}">
+<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.2"></rect><line x1="3" y1="10.5" x2="21" y2="10.5"></line></svg>
+<span style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase">Add</span>
+</div>
+</sc-if>
+</button>
+</sc-for>
+</div>
+</div>
+
+<sc-if value="{{ mobileActive }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:0">
+
+<div style="padding:12px 14px;border-top:1px solid var(--line);background:rgba(201,169,106,0.1)"><div style="font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--gold);font-weight:500">Requirements</div></div>
+<div style="display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line-soft)">
+<div style="flex:0 0 38%;min-width:0"><div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim)">Min. income</div><div style="font-family:var(--font-serif);font-size:18px;color:var(--text);margin-top:4px">{{ mobileActive.incomeFmt }}</div></div>
+<div style="flex:0 0 62%;min-width:0"><div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim)">Annual fee</div><div style="font-family:var(--font-serif);font-size:18px;color:var(--text);margin-top:4px">{{ mobileActive.feeFmt }}</div><div style="font-size:12px;color:var(--gold);white-space:pre-line;margin-top:2px">{{ mobileActive.feeDetails }}</div></div>
+</div>
+
+<div style="padding:12px 14px;border-top:1px solid var(--line);background:rgba(201,169,106,0.1);margin-top:20px"><div style="font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--gold);font-weight:500">Travel perks</div></div>
+<sc-for list="{{ mobileActive.perks }}" as="pk" hint-placeholder-count="4">
+<div style="border-bottom:1px solid var(--line-soft)">
+<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(201,169,106,0.1)">
+<x-import component-from-global-scope="AltitudeDesignSystem_346325.Icon" id="{{ pk.iconId }}" size="{{ 20 }}" hint-size="20px,20px" style="color:var(--gold);flex-shrink:0"></x-import>
+<span style="font-size:14px;font-weight:500;color:var(--text)">{{ pk.label }}</span>
+</div>
+<sc-if value="{{ pk.value }}" hint-placeholder-val="{{ false }}">
+<div style="font-size:13.5px;color:var(--text);font-weight:300;padding:10px 14px 4px;line-height:1.5">{{ pk.value }}</div>
+</sc-if>
+<sc-if value="{{ pk.isMixedFx }}" hint-placeholder-val="{{ false }}">
+<div style="font-size:13.5px;color:var(--text);font-weight:300;padding:10px 14px 4px;line-height:1.5"><a href="{{ pk.href }}" target="_blank" style="color:var(--gold);text-decoration:underline;text-underline-offset:2px">{{ pk.linkText }}</a>{{ pk.suffix }}</div>
+</sc-if>
+<sc-if value="{{ pk.hasStructuredSubs }}" hint-placeholder-val="{{ false }}">
+<sc-for list="{{ pk.subs }}" as="sb" hint-placeholder-count="0">
+<div style="display:flex;border-top:{{ sb.border }}">
+<div style="width:96px;flex-shrink:0;background:rgba(201,169,106,0.1);padding:6px 10px;text-align:right"><span style="font-size:10.5px;line-height:0.9;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-dim);font-weight:500">{{ sb.label }}</span></div>
+<div style="flex:1;min-width:0;padding:6px 10px">
+<sc-if value="{{ sb.isLink }}" hint-placeholder-val="{{ false }}"><a href="{{ sb.href }}" target="_blank" style="font-size:13px;line-height:1.4;font-weight:300;color:var(--gold);text-decoration:underline;text-underline-offset:2px">{{ sb.text }}</a></sc-if>
+<sc-if value="{{ !sb.isLink }}" hint-placeholder-val="{{ true }}"><span style="font-size:13px;line-height:1.4;font-weight:300;color:var(--text)">{{ sb.text }}</span></sc-if>
+</div>
+</div>
+</sc-for>
+</sc-if>
+<sc-if value="{{ !pk.hasStructuredSubs }}" hint-placeholder-val="{{ true }}">
+<div style="padding:0 14px 10px">
+<sc-for list="{{ pk.subs }}" as="sb" hint-placeholder-count="0">
+<div style="font-size:13.5px;color:var(--text);font-weight:300;line-height:1.5">{{ sb.text }}</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ pk.showCta }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex">
+<div style="width:96px;flex-shrink:0;background:rgba(201,169,106,0.1)"></div>
+<div style="flex:1;min-width:0;padding:10px 14px">
+<button onclick="{{ mobileActive.onOpenMap }}" style="width:100%;display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;color:var(--text);background:linear-gradient(100deg,rgba(201,169,106,0.17),rgba(201,169,106,0.04));border:1px solid var(--gold);border-radius:13px;padding:12px 14px;font-family:var(--font-sans)">
+<span style="width:32px;height:32px;border-radius:9px;background:var(--gradient-gold);color:var(--on-gold);display:grid;place-items:center;flex-shrink:0">
+<span style="width:16px;height:16px;border-radius:50%;border:1.4px solid var(--on-gold);display:grid;place-items:center">
+<span style="width:5px;height:5px;background:var(--on-gold);transform:rotate(45deg)"></span>
+</span>
+</span>
+<b style="font-family:var(--font-serif);font-weight:400;font-size:14px;min-width:0">Explore the Lounge Access Map</b>
+</button>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+
+<sc-if value="{{ mobileActive.hasVas }}" hint-placeholder-val="{{ false }}">
+<div style="padding:12px 14px;border-top:1px solid var(--line);background:rgba(201,169,106,0.1);margin-top:20px"><div style="font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--gold);font-weight:500">Value added services</div></div>
+<sc-for list="{{ mobileActive.vas }}" as="v" hint-placeholder-count="2">
+<div style="padding:14px 4px;border-bottom:1px solid var(--line-soft)">
+<sc-if value="{{ v.isText }}" hint-placeholder-val="{{ true }}"><span style="font-size:13.5px;line-height:1.45;color:var(--text);font-weight:300">{{ v.text }}</span></sc-if>
+<sc-if value="{{ v.isIcon }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="display:grid;place-items:center;color:var(--gold);flex-shrink:0">
+<x-import component-from-global-scope="AltitudeDesignSystem_346325.Icon" id="{{ v.icon }}" size="{{ 22 }}" hint-size="22px,22px"></x-import>
+</span>
+<span style="font-size:13.5px;line-height:1.45;color:var(--text);font-weight:300">{{ v.text }}</span>
+</div>
+</sc-if>
+<sc-if value="{{ v.isCta }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+<span style="font-size:13.5px;line-height:1.45;color:var(--text);font-weight:300">{{ v.text }}</span>
+<a href="{{ v.ctaHref }}" target="_blank" style="font-family:var(--font-sans);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;font-weight:500;padding:9px 16px;border-radius:999px;background:transparent;border:1px solid var(--gold);color:var(--gold);text-decoration:none">{{ v.ctaLabel }}</a>
+</div>
+</sc-if>
+<sc-if value="{{ v.isImage }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:stretch;gap:8px">
+<div style="width:100%;height:60px;border-radius:7px;border:1px dashed var(--line);background:rgba(255,255,255,0.02);display:grid;place-items:center;flex-shrink:0"><span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)">Image (fetched from AWS)</span></div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<span style="font-size:13.5px;line-height:1.45;color:var(--text);font-weight:300">{{ v.text }}</span>
+<a href="{{ v.ctaHref }}" target="_blank" style="font-size:13.5px;color:var(--gold);text-decoration:underline">Learn more</a>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</sc-if>
+
+<div style="display:flex;gap:10px;margin-top:20px">
+<a href="{{ mobileActive.applyUrl }}" target="_blank" style="flex:1;text-align:center;font-family:var(--font-sans);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;font-weight:500;padding:13px 0;border-radius:999px;background:var(--gradient-gold);color:var(--on-gold);text-decoration:none">Apply</a>
+</div>
+</div>
+</sc-if>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ !isMobile }}" hint-placeholder-val="{{ true }}">
+<section style="padding-bottom:16px">
+<table style="border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed;overflow-wrap:break-word">
+<thead>
+<tr>
+<th style="width:150px;text-align:left;vertical-align:bottom;padding:0 16px 14px 0;position:sticky;top:0;z-index:5;background-color:var(--bg);background-image:var(--gradient-atmosphere);background-attachment:fixed">
+<button onclick="{{ openPicker }}" style="width:100%;min-height:118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;font-family:var(--font-sans);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;font-weight:500;color:var(--gold);background:rgba(201,169,106,0.05);border:1px solid var(--gold);padding:14px 18px;border-radius:13px;cursor:pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.2"></rect><line x1="3" y1="10.5" x2="21" y2="10.5"></line></svg>
+Select card</button>
+</th>
+<sc-for list="{{ slots }}" as="s" hint-placeholder-count="5">
+<th style="padding:0 14px 14px 0;text-align:left;vertical-align:bottom;position:sticky;top:0;z-index:5;background-color:var(--bg);background-image:var(--gradient-atmosphere);background-attachment:fixed">
+<sc-if value="{{ s.filled }}" hint-placeholder-val="{{ true }}">
+<div style="position:relative;border-radius:13px;padding:14px 14px 36px;box-sizing:border-box;overflow:hidden;border:1px solid rgba(255,255,255,0.1);min-height:118px;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;box-shadow:var(--shadow-card-lg);background:{{ s.theme }};color:{{ s.fg }};opacity:{{ s.opacity }}">
+<div style="font-family:var(--font-serif);font-weight:400;font-size:clamp(16px,1.6vw,22px);line-height:1.15">{{ s.card_name }}</div>
+<div style="font-size:11.5px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.9">{{ s.bank }}</div>
+<a href="{{ s.applyUrl }}" target="_blank" style="position:absolute;right:14px;bottom:12px;display:flex;align-items:center;gap:5px;font-family:var(--font-sans);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;font-weight:500;color:{{ s.fg }};text-decoration:none;opacity:0.85">Apply<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="8 7 17 7 17 16"></polyline></svg></a>
+</div>
+</sc-if>
+<sc-if value="{{ s.empty }}" hint-placeholder-val="{{ false }}">
+<button onclick="{{ openPicker }}" style="width:100%;min-height:118px;border:1px dashed var(--line);border-radius:13px;background:rgba(255,255,255,0.02);color:var(--text-dim);font-family:var(--font-sans);font-size:9.5px;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;display:grid;place-items:center">Select card</button>
+</sc-if>
+</th>
+</sc-for>
+</tr>
+</thead>
+<tbody>
+<tr><td colspan="{{ totalCols }}" style="padding:16px 14px;border-top:1px solid var(--line);background:rgba(201,169,106,0.1)"><div style="font-size:12.5px;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);font-weight:500">Requirements</div></td></tr>
+<tr>
+<th style="text-align:left;padding:18px 16px 18px 14px;border-top:1px solid var(--line-soft);vertical-align:top;background:rgba(201,169,106,0.1)"><div style="display:flex;align-items:center;gap:12px">
+<span style="display:grid;place-items:center;color:var(--gold);flex-shrink:0">
+<x-import component-from-global-scope="AltitudeDesignSystem_346325.Icon" id="overseas" size="{{ 30 }}" hint-size="30px,30px"></x-import>
+</span>
+<span style="font-size:15px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--text)">Minimum income</span>
+</div></th>
+<sc-for list="{{ incomeCells }}" as="v" hint-placeholder-count="5">
+<td style="padding:18px 14px;border-top:1px solid var(--line-soft);vertical-align:top;opacity:{{ v.opacity }}">
+<div style="font-family:var(--font-serif);font-size:19px;color:{{ v.color }}">{{ v.text }}</div>
+<div style="font-size:13px;color:var(--text-dim);font-weight:300;margin-top:6px">{{ v.sub }}</div>
+</td>
+</sc-for>
+</tr>
+<tr>
+<th style="text-align:left;padding:18px 16px 18px 14px;border-top:1px solid var(--line-soft);vertical-align:top;background:rgba(201,169,106,0.1)"><div style="display:flex;align-items:center;gap:12px">
+<span style="display:grid;place-items:center;color:var(--gold);flex-shrink:0">
+<x-import component-from-global-scope="AltitudeDesignSystem_346325.Icon" id="protection" size="{{ 30 }}" hint-size="30px,30px"></x-import>
+</span>
+<span style="font-size:15px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--text)">Annual fee</span>
+</div></th>
+<sc-for list="{{ feeCells }}" as="v" hint-placeholder-count="5">
+<td style="padding:18px 14px;border-top:1px solid var(--line-soft);vertical-align:top;opacity:{{ v.opacity }}">
+<div style="font-family:var(--font-serif);font-size:19px;color:{{ v.color }}">{{ v.text }}</div>
+<div style="font-size:13px;color:var(--gold);font-weight:300;margin-top:6px;line-height:1.5;white-space:pre-line">{{ v.sub }}</div>
+</td>
+</sc-for>
+</tr>
+
+<tr><td colspan="{{ totalCols }}" style="height:34px"></td></tr>
+<tr><td colspan="{{ totalCols }}" style="padding:16px 14px;background:rgba(201,169,106,0.1);border-top:1px solid var(--line)"><div style="font-size:12.5px;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);font-weight:500">Travel perks</div></td></tr>
+<sc-for list="{{ perkRows }}" as="row" hint-placeholder-count="5">
+<tr>
+<th style="text-align:left;padding:18px 16px 18px 14px;border-top:1px solid var(--line-soft);vertical-align:top;background:rgba(201,169,106,0.1)">
+<div style="display:flex;align-items:center;gap:12px">
+<span style="display:grid;place-items:center;color:var(--gold);flex-shrink:0">
+<x-import component-from-global-scope="AltitudeDesignSystem_346325.Icon" id="{{ row.iconId }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>
+</span>
+<span style="font-size:15px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--text)">{{ row.label }}</span>
+</div>
+</th>
+<sc-for list="{{ row.cells }}" as="v" hint-placeholder-count="5">
+<td style="padding:18px 14px;border-top:1px solid var(--line-soft);vertical-align:top;opacity:{{ v.opacity }}">
+<sc-if value="{{ v.mixed }}" hint-placeholder-val="{{ false }}">
+<span style="font-size:15px;line-height:1.45;color:var(--text);font-weight:300"><a href="{{ v.href }}" target="_blank" style="color:var(--gold);text-decoration:underline;text-underline-offset:2px">{{ v.linkText }}</a>{{ v.suffix }}</span>
+</sc-if>
+<sc-if value="{{ v.has }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:flex-start;gap:8px">
+<span style="color:var(--gold);flex-shrink:0;margin-top:2px">
+<x-import component-from-global-scope="AltitudeDesignSystem_346325.CheckIcon" size="{{ 13 }}" hint-size="13px,13px"></x-import>
+</span>
+<span style="font-size:15px;line-height:1.45;color:{{ v.color }};font-weight:300">{{ v.text }}</span>
+</div>
+<div style="font-size:13px;line-height:1.45;color:var(--text-dim);font-weight:300;margin-top:5px;padding-left:21px">{{ v.sub }}</div>
+<sc-if value="{{ v.sub2 }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;line-height:1.45;color:var(--text-dim);font-weight:300;margin-top:2px;padding-left:21px">{{ v.sub2 }}</div></sc-if>
+</sc-if>
+<sc-if value="{{ v.missing }}" hint-placeholder-val="{{ false }}">
+<span style="font-size:13.5px;color:var(--text-dim);font-weight:300">{{ v.text }}</span>
+</sc-if>
+</td>
+</sc-for>
+</tr>
+<sc-for list="{{ row.subRows }}" as="sr" hint-placeholder-count="0">
+<tr>
+<td style="text-align:right;padding:5px 16px 5px 14px;vertical-align:top;background:rgba(201,169,106,0.1)"><span style="font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim);font-weight:500">{{ sr.label }}</span></td>
+<sc-for list="{{ sr.cells }}" as="v" hint-placeholder-count="5">
+<td style="padding:5px 14px;vertical-align:top;border-top:{{ sr.border }};opacity:{{ v.opacity }}">
+<sc-if value="{{ v.isLink }}" hint-placeholder-val="{{ false }}"><a href="{{ v.href }}" target="_blank" style="font-size:13.5px;line-height:1.4;font-weight:300;color:var(--gold);text-decoration:underline;text-underline-offset:2px">{{ v.text }}</a></sc-if>
+<sc-if value="{{ v.plain }}" hint-placeholder-val="{{ true }}"><span style="font-size:13.5px;line-height:1.4;font-weight:300;color:{{ v.color }}">{{ v.text }}</span></sc-if>
+</td>
+</sc-for>
+</tr>
+</sc-for>
+<sc-if value="{{ row.showCta }}" hint-placeholder-val="{{ false }}">
+<tr><td style="padding:16px 0 34px;background:rgba(201,169,106,0.1)"></td><td colspan="{{ cardColSpan }}" style="padding:16px 14px 34px">
+<button onclick="{{ openMap }}" style="width:100%;display:flex;align-items:center;gap:18px;text-align:left;cursor:pointer;color:var(--text);background:linear-gradient(100deg,rgba(201,169,106,0.17),rgba(201,169,106,0.04));border:1px solid var(--gold);border-radius:15px;padding:17px 24px;font-family:var(--font-sans)">
+<span style="width:40px;height:40px;border-radius:11px;background:var(--gradient-gold);color:var(--on-gold);display:grid;place-items:center;flex-shrink:0">
+<span style="width:20px;height:20px;border-radius:50%;border:1.4px solid var(--on-gold);display:grid;place-items:center">
+<span style="width:7px;height:7px;background:var(--on-gold);transform:rotate(45deg)"></span>
+</span>
+</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<b style="font-family:var(--font-serif);font-weight:400;font-size:18px">Explore the Lounge Access Map</b>
+<span style="font-size:13px;color:var(--text-dim);font-weight:300">See every partner lounge across the global network — by airport and region.</span>
+</span>
+<span style="color:var(--gold);font-size:19px">→</span>
+</button>
+</td></tr>
+</sc-if>
+</sc-for>
+
+<sc-if value="{{ showValueAdded }}" hint-placeholder-val="{{ true }}">
+<tr><td colspan="{{ totalCols }}" style="height:34px"></td></tr>
+<tr><td colspan="{{ totalCols }}" style="padding:16px 14px;background:rgba(201,169,106,0.1);border-top:1px solid var(--line)"><div style="font-size:12.5px;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);font-weight:500">Value added services</div></td></tr>
+</sc-if>
+<sc-for list="{{ vasRows }}" as="row" hint-placeholder-count="2">
+<tr>
+<td style="padding:18px 14px"></td>
+<sc-for list="{{ row.cells }}" as="v" hint-placeholder-count="5">
+<td style="padding:18px 14px;border-top:1px solid var(--line-soft);vertical-align:top;opacity:{{ v.opacity }}">
+<sc-if value="{{ v.isText }}" hint-placeholder-val="{{ true }}"><span style="font-size:15px;line-height:1.45;color:{{ v.color }};font-weight:300">{{ v.text }}</span></sc-if>
+<sc-if value="{{ v.isIcon }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="display:grid;place-items:center;color:var(--gold);flex-shrink:0">
+<x-import component-from-global-scope="AltitudeDesignSystem_346325.Icon" id="{{ v.icon }}" size="{{ 26 }}" hint-size="26px,26px"></x-import>
+</span>
+<span style="font-size:15px;line-height:1.45;color:{{ v.color }};font-weight:300">{{ v.text }}</span>
+</div>
+</sc-if>
+<sc-if value="{{ v.isCta }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+<span style="font-size:15px;line-height:1.45;color:{{ v.color }};font-weight:300">{{ v.text }}</span>
+<a href="{{ v.ctaHref }}" target="_blank" style="font-family:var(--font-sans);font-size:11px;letter-spacing:0.16em;text-transform:uppercase;font-weight:500;padding:9px 16px;border-radius:999px;background:transparent;border:1px solid var(--gold);color:var(--gold);text-decoration:none">{{ v.ctaLabel }}</a>
+</div>
+</sc-if>
+<sc-if value="{{ v.isImage }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;align-items:stretch;gap:8px">
+<div style="width:100%;height:60px;border-radius:7px;border:1px dashed var(--line);background:rgba(255,255,255,0.02);display:grid;place-items:center;flex-shrink:0"><span style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)">Image (fetched from AWS)</span></div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<span style="font-size:15px;line-height:1.45;color:{{ v.color }};font-weight:300">{{ v.text }}</span>
+<a href="{{ v.ctaHref }}" target="_blank" style="font-size:15px;color:var(--gold);text-decoration:underline">Learn more</a>
+</div>
+</div>
+</sc-if>
+</td>
+</sc-for>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</section>
+</sc-if>
+</main>
+
+<sc-if value="{{ pickerOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;top:0;bottom:0;left:{{ pickerOverlayLeft }};width:{{ pickerOverlayWidth }};transform:{{ pickerOverlayTransform }};z-index:200;display:grid;place-items:center;padding:{{ pickerOuterPad }};box-sizing:border-box">
+<div onclick="{{ closePicker }}" style="position:absolute;inset:0;background:rgba(10,9,13,0.8);backdrop-filter:blur(18px)"></div>
+<div style="{{ pickerModalStyle }}">
+<header style="padding:{{ pickerHeaderPad }};border-bottom:1px solid var(--line-soft);display:flex;flex-direction:column;gap:14px;flex-shrink:0">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px">
+<div>
+<h2 style="font-family:var(--font-serif);font-weight:400;font-size:{{ pickerTitleFont }};margin:0;color:var(--text)">Select cards to compare</h2>
+</div>
+<button onclick="{{ closePicker }}" style="background:none;border:1px solid var(--line-soft);color:var(--gold);width:{{ pickerCloseSize }};height:{{ pickerCloseSize }};border-radius:50%;cursor:pointer;font-size:{{ pickerCloseFont }};flex-shrink:0">×</button>
+</div>
+<div style="{{ pickerSlotsStyle }}">
+<sc-for list="{{ slots }}" as="s" hint-placeholder-count="5">
+<div style="flex:{{ pickerSlotWidth }};border-radius: 12px; padding: 8px 13px; height: 70px; display: flex; flex-direction: column; justify-content: center; gap: 6px; background: {{ s.stripBg }}; border: 1px {{ s.stripBorderStyle }} {{ s.stripBorder }}">
+<sc-if value="{{ s.filled }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+<div style="display:flex;flex-direction:column;gap:3px">
+<span style="font-family:var(--font-serif);font-size:15px;line-height:1.15;color:{{ s.stripFg }}">{{ s.stripName }}</span>
+<span style="font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:{{ s.stripMetaFg }};opacity:0.9">{{ s.stripMeta }}</span>
+</div>
+<button onclick="{{ s.onRemove }}" style="background:none;border:none;color:{{ s.stripFg }};font-size:22px;line-height:1;cursor:pointer;padding:6px;opacity:0.75;flex-shrink:0">×</button>
+</div>
+</sc-if>
+<sc-if value="{{ s.empty }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;justify-content:center;text-align:center">
+<span style="font-family:var(--font-sans);font-size:13px;font-weight:300;color:var(--text-dim)">{{ s.stripName }}</span>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<div style="position:relative">
+<input value="{{ search }}" onInput="{{ onSearch }}" onFocus="{{ onSearchFocus }}" onBlur="{{ onSearchBlur }}" placeholder="Search for a card or bank" style="width:100%;background:var(--surface);border:1px solid var(--line-soft);border-radius:13px;padding:16px 18px;padding-right:{{ searchPadRight }};color:var(--text);font-family:var(--font-sans);font-size:16px;font-weight:300;outline:none">
+<div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;max-width:60%;overflow-x:auto">
+<sc-for list="{{ bankChips }}" as="b" hint-placeholder-count="0">
+<span style="display:inline-flex;align-items:center;gap:7px;padding:4px 6px 4px 10px;border-radius:6px;background:var(--gradient-gold);color:var(--on-gold);font-family:var(--font-serif);font-size:15px;font-weight:500;white-space:nowrap;flex-shrink:0">{{ b.label }}<button onclick="{{ b.onRemove }}" style="background:none;border:none;color:var(--on-gold);font-size:14px;line-height:1;cursor:pointer;padding:0 2px 0 0;opacity:0.75">×</button></span>
+</sc-for>
+<sc-for list="{{ cardChips }}" as="k" hint-placeholder-count="0">
+<span style="display:inline-flex;align-items:center;gap:7px;padding:4px 6px 4px 10px;border-radius:6px;background:var(--gradient-gold);color:var(--on-gold);font-family:var(--font-serif);font-size:15px;font-weight:500;white-space:nowrap;flex-shrink:0">{{ k.label }}<button onclick="{{ k.onRemove }}" style="background:none;border:none;color:var(--on-gold);font-size:14px;line-height:1;cursor:pointer;padding:0 2px 0 0;opacity:0.75">×</button></span>
+</sc-for>
+</div>
+<sc-if value="{{ showSuggest }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:5;background:#191821;border:1px solid var(--line);border-radius:13px;overflow:hidden;box-shadow:0 20px 44px rgba(0,0,0,0.5)">
+<sc-for list="{{ suggestions }}" as="sg" hint-placeholder-count="3">
+<button onclick="{{ sg.onClick }}" style="width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 17px;background:none;border:none;border-bottom:1px solid var(--line-soft);cursor:pointer;font-family:var(--font-sans);white-space:nowrap">
+<span style="font-family:var(--font-sans);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);font-weight:500">{{ sg.bank }}</span>
+<sc-if value="{{ sg.card_name }}" hint-placeholder-val="{{ true }}"><span style="font-family:var(--font-serif);font-size:15px;color:var(--text);font-weight:400">{{ sg.card_name }}</span></sc-if>
+</button>
+</sc-for>
+<sc-if value="{{ noSuggest }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 17px;font-size:13px;color:var(--text-faint);font-weight:300">No matches</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+<div style="{{ pickerFilterGridStyle }}">
+<div style="display:grid;grid-template-columns:96px 1fr;gap:4px;align-items:center;border:1px solid var(--line-soft);border-radius:13px;padding:15px 17px;background:var(--surface)">
+<div style="font-family:var(--font-sans);font-size:15px;font-weight:400;color:var(--text);line-height:1.3">Annual<br>fee</div>
+<div style="position:relative;height:34px;padding:0;box-sizing:border-box">
+<input type="range" min="0" max="3" step="1" value="{{ feeIdx }}" onChange="{{ onFee }}" style="width:100%;position:absolute;top:50%;left:0;transform:translateY(-50%);margin:0;accent-color:var(--gold);background:transparent;z-index:1">
+<div style="position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:2;overflow:hidden">
+<span style="{{ feeMark.style }}">{{ feeMark.label }}</span>
+</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:96px 1fr;gap:4px;align-items:center;border:1px solid var(--line-soft);border-radius:13px;padding:15px 17px;background:var(--surface)">
+<div style="font-family:var(--font-sans);font-size:15px;font-weight:400;color:var(--text);line-height:1.3">Minimum<br>income</div>
+<div style="position:relative;height:34px;padding:0;box-sizing:border-box">
+<input type="range" min="0" max="3" step="1" value="{{ incomeIdx }}" onChange="{{ onIncome }}" style="width:100%;position:absolute;top:50%;left:0;transform:translateY(-50%);margin:0;accent-color:var(--gold);background:transparent;z-index:1">
+<div style="position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:2;overflow:hidden">
+<span style="{{ incomeMark.style }}">{{ incomeMark.label }}</span>
+</div>
+</div>
+</div>
+</div></header>
+<div style="padding:{{ pickerContentPad }};position:relative;overflow-y:auto;flex:1;min-height:0">
+<div style="{{ pickerCardsGridStyle }}">
+<sc-for list="{{ pickerCards }}" as="p" hint-placeholder-count="6">
+<div style="border:1px solid {{ p.border }};border-radius:16px;padding:{{ pickerCardPad }};overflow:hidden;display:flex;flex-direction:column;gap:12px;background:{{ p.theme }};color:{{ p.fg }}">
+<div style="display:flex;flex-direction:column;gap:4px">
+<div style="font-family:var(--font-serif);font-size:{{ pickerCardNameFont }};line-height:1.15">{{ p.card_name }}</div>
+<div style="font-size:11.5px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.9">{{ p.bank }}</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:14.5px;font-weight:300"><span style="opacity:0.85">Min. income</span><span style="font-family:var(--font-serif);font-size:16px;font-weight:400">{{ p.incomeFmt }}</span></div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:14.5px;font-weight:300"><span style="opacity:0.85">Annual fee</span><span style="font-family:var(--font-serif);font-size:16px;font-weight:400">{{ p.feeFmt }}</span></div>
+</div>
+<button onclick="{{ p.onClick }}" disabled="{{ p.disabled }}" style="width:100%;font-family:var(--font-sans);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;font-weight:500;padding:10px 0;border-radius:999px;cursor:{{ p.cursor }};background:{{ p.btnBg }};border:1px solid {{ p.btnBorder }};color:{{ p.btnFg }}">{{ p.btnLabel }}</button>
+</div>
+</sc-for>
+<sc-if value="{{ showResetCard }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px dashed var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;min-height:180px">
+<div style="font-size:13.5px;color:var(--text-dim);font-weight:300">Not seeing the right cards?</div>
+<button onclick="{{ resetFilters }}" style="font-family:var(--font-sans);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;font-weight:500;padding:14px 22px;border-radius:999px;cursor:pointer;background:transparent;border:1px solid var(--gold);color:var(--gold)">Reset filters</button>
+</div>
+</sc-if>
+</div>
+<sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px dashed var(--line);border-radius:16px;padding:48px;text-align:center">
+<div style="font-family:var(--font-serif);font-size:20px;color:var(--text)">No cards match these filters</div>
+<p style="font-size:13.5px;color:var(--text-dim);font-weight:300;margin:8px 0 0">Widen the fee or salary range, or clear the bank filter.</p>
+</div>
+</sc-if>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;preview&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Full&quot;,&quot;options&quot;:[&quot;Full&quot;,&quot;Mobile&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Preview&quot;}}">
+const NAV_STEPS = [{id:'profile',num:'01',label:'Profile'},{id:'listing',num:'02',label:'Cards'},{id:'cart',num:'03',label:'Compare'}];
+const PERK_ROWS = [
+  {id:'lounge',    label:'Airport lounge access',           get:c => c.perks.lounge ? 'Included' : null,
+   pick:c => c.perks.lounge, subs:[{key:'visits',label:'Visits'},{key:'access',label:'Access'},{key:'network',label:'Network'},{key:'condition',label:'Condition'}], cta:true},
+  {id:'insurance', label:'Life & medical travel insurance', get:c => c.perks.insurance && (c.perks.insurance.medical || c.perks.insurance.accident),
+   pick:c => c.perks.insurance, subs:[{key:'medical',label:'Medical'},{key:'accident',label:'Life'},{key:'condition',label:'Condition'},{key:'underwriter',label:'Insurer',link:'underwriterUrl'}]},
+  {id:'miles',     label:'Spending rewards',                get:c => c.perks.overseas, sub:c => c.perks.miles, sub2:c => c.perks.categories},
+  {id:'overseas',  label:'Foreign transaction fee', mixedFx:true},
+  {id:'protection',label:'Travel curtailments',             get:c => extraOf(c).curtail ? 'Included' : null,
+   pick:c => extraOf(c).curtail, subs:[{key:'delay',label:'Flight delay'},{key:'cancellation',label:'Flight Cancellation'},{key:'baggage',label:'Baggage delay'},{key:'condition',label:'Condition'},{key:'underwriter',label:'Insurer',link:'underwriterUrl'}]},
+];
+const FEE_STEPS = [{v:0,label:'No fee'},{v:300,label:'RM300'},{v:600,label:'RM600'},{v:Infinity,label:'Any fee'}];
+const INCOME_STEPS = [{v:20000,label:'RM 20k'},{v:50000,label:'RM 50k'},{v:100000,label:'RM 100k'},{v:Infinity,label:'Any income'}];
+const LOUNGE_FIELDS = [{key:'visits',label:'Visits'},{key:'access',label:'Access'},{key:'network',label:'Network'},{key:'condition',label:'Condition'}];
+const VISA_FX = 'https://usa.visa.com/support/consumer/travel-support/exchange-rate-calculator.html';
+const MC_FX = 'https://www.mastercard.us/en-us/personal/get-support/convert-currency.html';
+const AIG_URL = 'https://www.aig.my/';
+const CHUBB_URL = 'https://www.chubb.com/my-en/';
+const fmt = n => 'RM ' + n.toLocaleString('en-MY');
+const LOCAL_CARDS = [
+  {id:'aurora-infinite', bank:'Aurora', card_name:'Infinite', tier:'Invitation Only', net:'World Elite',
+   theme:'linear-gradient(135deg,rgba(233,199,120,0) 0%,rgba(233,199,120,0.24) 50%,rgba(233,199,120,0) 100%),#100d07', fg:'#ecdcb4', min_income:600000, annual_fee:3180,
+   annual_fee_details:'· Waived with RM120,000 annual spend\n· 50% off with RM60,000 annual spend',
+   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 1 supplementary + unlimited guests',network:'1,300+ lounges worldwide · Priority Pass Select',condition:'No spend condition'},
+     insurance:{medical:'Up to RM 1,000,000 overseas medical',accident:'Up to RM 5,000,000 accidental death',condition:'Automatic — no minimum spend required',underwriter:'AIG Malaysia Insurance Berhad',underwriterUrl:AIG_URL},
+     overseas:'5% cashback, all currencies', miles:'2.0 miles per RM 1', categories:'Retail 2x · Dining 4x',
+     fx:{fee:'1% on foreign currency spend',pct:'1%',provider:'Visa Exchange Rate Calculator',providerUrl:VISA_FX},
+     curtail:{delay:'RM 2,000 after 4 hours',cancellation:'Up to RM 50,000',baggage:'RM 2,000 after 6 hours',condition:'Automatic when travel is booked on the card',underwriter:'AIG Malaysia Insurance Berhad',underwriterUrl:AIG_URL},
+     vas:[{kind:'text',text:'Dedicated lifestyle manager'},{kind:'text',text:'Unlimited golf green fees'}]}},
+  {id:'aurora-reserve', bank:'Aurora', card_name:'Reserve', tier:'Reserve', net:'Signature',
+   theme:'linear-gradient(135deg,rgba(214,150,104,0) 0%,rgba(214,150,104,0.2) 50%,rgba(214,150,104,0) 100%),#140c08', fg:'#ecd6bf', min_income:150000, annual_fee:800,
+   annual_fee_details:'Waived with RM 80,000 annual spend',
+   perks:{lounge:{visits:'6 visits / year',access:'Cardholder only',network:'25 Plaza Premium Lounges · Asia-Pacific',condition:'Min. RM 500 spend within 30 days of entry'},
+     insurance:{medical:null,accident:'Up to RM 1,000,000 accidental death',condition:'Min. RM 500 travel spend on the card',underwriter:'Chubb Insurance Malaysia Berhad',underwriterUrl:CHUBB_URL},
+     overseas:'2% cashback, all currencies', miles:'1.2 miles per RM 1', categories:'Retail 1x · Dining 2x',
+     fx:{fee:'1.5% on foreign currency spend',pct:'1.5%',provider:'Visa Exchange Rate Calculator',providerUrl:VISA_FX},
+     curtail:{delay:'RM 500 after 6 hours',cancellation:'Up to RM 5,000',baggage:'RM 500 after 8 hours',condition:'Min. RM 1,000 travel booking on the card',underwriter:'Chubb Insurance Malaysia Berhad',underwriterUrl:CHUBB_URL},
+     vas:[{kind:'text',text:'24/7 concierge desk'},{kind:'text',text:'6 green fees / year'}]}},
+  {id:'meridian-infinite', bank:'Meridian', card_name:'Infinite', tier:'Infinite', net:'World Elite',
+   theme:'linear-gradient(135deg,#1b3a6b 0%,#7a1f2b 100%)', fg:'#f0e2e4', min_income:400000, annual_fee:2000,
+   annual_fee_details:'Waived with RM 200,000 annual spend',
+   perks:{lounge:{visits:'Unlimited visits',access:'Cardholder + 2 guests',network:'1,300+ lounges · Priority Pass',condition:'No spend condition'},
+     insurance:{medical:'Up to RM 800,000 overseas medical',accident:'Up to RM 3,000,000 accidental death',condition:'Automatic — no minimum spend required',underwriter:'AIG Malaysia Insurance Berhad',underwriterUrl:AIG_URL},
+     overseas:'4% cashback, all currencies', miles:'1.8 miles per RM 1', categories:'Retail 1.8x · Dining 3.5x',
+     fx:{fee:'1% on foreign currency spend',pct:'1%',provider:'Mastercard Currency Converter',providerUrl:MC_FX},
+     curtail:{delay:'RM 1,800 after 4 hours',cancellation:'Up to RM 40,000',baggage:'RM 1,800 after 6 hours',condition:'Automatic when travel is booked on the card',underwriter:'AIG Malaysia Insurance Berhad',underwriterUrl:AIG_URL},
+     vas:[{kind:'text',text:'Dedicated lifestyle manager'},{kind:'icon',icon:'golf',text:'Unlimited green fees, worldwide'},{kind:'cta',text:'Complimentary annual travel insurance top-up',ctaLabel:'Activate benefit',ctaHref:'#'},{kind:'image',imageId:'vas-meridian-infinite-4',text:'Access to partner golf resorts'}]}},
+  {id:'meridian-world', bank:'Meridian', card_name:'World', tier:'World', net:'World',
+   theme:'linear-gradient(135deg,rgba(120,206,170,0) 0%,rgba(120,206,170,0.18) 50%,rgba(120,206,170,0) 100%),#08130f', fg:'#cfe6da', min_income:200000, annual_fee:1080,
+   annual_fee_details:'Waived with RM 100,000 annual spend',
+   perks:{lounge:null,
+     insurance:null,
+     overseas:null, miles:null, categories:null,
+     fx:{fee:'1.5% on foreign currency spend',pct:'1.5%',provider:'Mastercard Currency Converter',providerUrl:MC_FX},
+     curtail:null,
+     vas:null}},
+  {id:'horizon-world-elite', bank:'Horizon Bank', card_name:'World Elite', tier:'World Elite', net:'World Elite',
+   theme:'linear-gradient(135deg,rgba(130,168,232,0) 0%,rgba(130,168,232,0.2) 50%,rgba(130,168,232,0) 100%),#080d18', fg:'#cdd9ee', min_income:120000, annual_fee:600,
+   annual_fee_details:'Waived with RM 60,000 annual spend',
+   perks:{lounge:{visits:'4 visits / year',access:'Cardholder only',network:'Plaza Premium Lounges · Malaysia',condition:'Min. RM 6,000 spend in each qualifying quarter'},
+     insurance:{medical:null,accident:'Up to RM 1,000,000 accidental death',condition:'Min. RM 3,000 spend within 90 days',underwriter:'N/A — confirm with issuer'},
+     overseas:'1.5% cashback, all currencies', miles:'1.0 mile per RM 1', categories:'Retail 1x · Dining 1.5x',
+     fx:{fee:'2% on foreign currency spend',pct:'2%',provider:'Visa Exchange Rate Calculator',providerUrl:VISA_FX},
+     curtail:{delay:'RM 300 after 6 hours',cancellation:'Up to RM 2,000',baggage:null,condition:'Min. RM 2,000 travel booking on the card',underwriter:'N/A — confirm with issuer'},
+     vas:[{kind:'text',text:'Travel concierge desk'}]}},
+];
+const extraOf = c => c.perks;
+const bankOf = c => c.bank;
+
+const EMPTY = { navSteps: NAV_STEPS, slots: [], slotCount: 5, totalCols: 6, cardColSpan: 5, pickerOpen: false,
+  incomeCells: [], feeCells: [], perkRows: [], vasRows: [], showValueAdded: true, pickerCards: [], bankChips: [],
+  noResults: false, showResetCard: false, feeLabel: '', incomeLabel: '', feeIdx: 3, incomeIdx: 3, search: '',
+  suggestions: [], showSuggest: false, noSuggest: false, cardChips: [], searchPadRight: '18px',
+  isMobile: false, mobileTiles: [], mobileTilesRow1: [], mobileTilesRow2: [], mobileActive: null, mobileDialogBtn: {}, mainPadding: '0 28px 96px', titlePadding: '48px 0 12px', titleFontSize: 'clamp(24px,3.3vw,44px)', subtextFontSize: '17px',
+  pickerOuterPad: '26px', pickerOverlayLeft: '0', pickerOverlayWidth: '100%', pickerOverlayTransform: 'none', pickerModalStyle: '', pickerHeaderPad: '16px 32px 14px', pickerTitleFont: '28px', pickerCloseSize: '48px', pickerCloseFont: '22px',
+  pickerSlotsStyle: '', pickerSlotWidth: 'initial', pickerFilterGridStyle: '', pickerContentPad: '26px 32px 34px', pickerCardsGridStyle: '', pickerCardPad: '14px', pickerCardNameFont: '22px' };
+
+class Component extends DCLogic {
+  state = { cart: ['aurora-infinite','meridian-infinite','aurora-reserve','meridian-world','horizon-world-elite'], pickerOpen: false, search: '', banks: [], cardFilters: [], feeIdx: 3, incomeIdx: 3, searchFocused: false,
+    viewportWidth: (typeof window !== 'undefined' ? window.innerWidth : 1280), mobileOpenIdx: 0 };
+
+  componentDidMount() {
+    this.onResize = () => this.setState({ viewportWidth: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+  }
+  componentDidUpdate() {
+    const lock = this.state.pickerOpen ? 'hidden' : '';
+    if (document.documentElement.style.overflow !== lock) { document.documentElement.style.overflow = lock; document.body.style.overflow = lock; }
+  }
+  componentWillUnmount() { document.documentElement.style.overflow = ''; document.body.style.overflow = ''; window.removeEventListener('resize', this.onResize); }
+
+  slotCount = () => 5;
+
+  remove = id => this.setState(s => ({ cart: s.cart.filter(x => x !== id) }));
+  add = id => this.setState(s => s.cart.includes(id) || s.cart.length >= this.slotCount() ? s : ({ cart: [...s.cart, id] }));
+
+  renderVals() {
+    const CARDS = LOCAL_CARDS, fmtRM = fmt;
+    const { cart, search, banks, feeIdx, incomeIdx } = this.state;
+    const slotCount = this.slotCount();
+    const cards = cart.map(id => CARDS.find(c => c.id === id)).filter(Boolean).slice(0, slotCount);
+    const dimOf = () => 1;
+
+    const slots = Array.from({ length: slotCount }, (_, i) => {
+      const c = cards[i];
+      if (!c) return { filled: false, empty: true, stripBg: 'rgba(255,255,255,0.02)', stripBorder: 'var(--line)',
+        stripBorderStyle: 'dashed', stripFg: 'var(--text-faint)', stripMetaFg: 'var(--text-faint)',
+        stripName: 'Select below' };
+      return { filled: true, empty: false, theme: extraOf(c).theme || c.theme, fg: extraOf(c).fg || c.fg, bank: bankOf(c), card_name: c.card_name,
+        opacity: dimOf(i), onRemove: () => this.remove(c.id), applyUrl: extraOf(c).applyUrl || '#',
+        stripBg: extraOf(c).theme || c.theme, stripBorder: 'rgba(255,255,255,0.14)', stripBorderStyle: 'solid',
+        stripFg: extraOf(c).fg || c.fg, stripMetaFg: extraOf(c).fg || c.fg, stripMeta: bankOf(c), stripName: c.card_name };
+    });
+
+    const cellsFor = (get, sub, hrefGet, sub2) => Array.from({ length: slotCount }, (_, i) => {
+      const c = cards[i];
+      if (!c) return { has: false, missing: true, plain: true, isLink: false, text: '', sub: '', sub2: '', href: '', opacity: 0.35, color: 'var(--text-faint)' };
+      const val = get(c), subVal = sub ? sub(c) : null, sub2Val = sub2 ? sub2(c) : null, href = hrefGet ? hrefGet(c) : null;
+      return { has: !!val, missing: !val, isLink: !!(href && val), plain: !(href && val),
+        text: val || 'Not offered', sub: subVal || '', sub2: sub2Val || '', href: href || '',
+        opacity: 1, color: val ? 'var(--text)' : 'var(--text-dim)' };
+    });
+
+    const isMobile = (this.props.preview ?? 'Full') === 'Mobile' ? true : this.state.viewportWidth < 768;
+    const isPreviewMobile = (this.props.preview ?? 'Full') === 'Mobile';
+    let activeIdx = this.state.mobileOpenIdx ?? 0;
+    if (activeIdx >= slotCount) activeIdx = 0;
+    const mobileTiles = Array.from({ length: slotCount }, (_, i) => {
+      const c = cards[i];
+      const active = activeIdx === i;
+      const setActive = () => this.setState({ mobileOpenIdx: i });
+      if (!c) return { empty: true, filled: false, active, onClick: setActive,
+        bg: active ? 'rgba(201,169,106,0.08)' : 'rgba(255,255,255,0.02)',
+        border: active ? '1px dashed var(--gold)' : '1px dashed var(--line)', fg: 'var(--gold)' };
+      const theme = extraOf(c).theme || c.theme, fg = extraOf(c).fg || c.fg;
+      return { filled: true, empty: false, active, onClick: setActive, card_name: c.card_name, bank: bankOf(c),
+        bg: active ? theme : 'var(--surface)',
+        border: active ? '1px solid rgba(255,255,255,0.14)' : '1px solid var(--line-soft)',
+        fg: active ? fg : 'var(--text-dim)' };
+    });
+    const mobileTilesRow1 = mobileTiles.slice(0, 2);
+    const mobileTilesRow2 = mobileTiles.slice(2, 5);
+    const activeCard = cards[activeIdx];
+    const mobileDialogBtn = activeCard
+      ? { label: 'Change card', onClick: () => this.setState({ pickerOpen: true }),
+          bg: 'transparent', border: '1px solid var(--line-soft)', fg: 'var(--text-dim)' }
+      : { label: 'Select card', onClick: () => this.setState({ pickerOpen: true }),
+          bg: 'var(--gradient-gold)', border: 'none', fg: 'var(--on-gold)' };
+    const mobileActive = activeCard ? (() => {
+      const c = activeCard;
+      const perks = PERK_ROWS.map(r => {
+        if (r.mixedFx) {
+          const fx = extraOf(c).fx;
+          if (!fx) return null;
+          return { iconId: 'overseas', label: r.label, value: '', hasStructuredSubs: false, showCta: false,
+            isMixedFx: true, linkText: fx.provider.replace(' Calculator', ''), href: fx.providerUrl,
+            suffix: ` rate, plus ${fx.pct} ${bankOf(c)} fee`, subs: [] };
+        }
+        const val = r.get(c);
+        if (!val) return null;
+        if (r.subs) {
+          const o = r.pick(c);
+          const subs = r.subs.map((f, si) => { const v = o && o[f.key]; if (!v) return null; const href = f.link ? (o && o[f.link]) : null; return { label: f.label, text: v, href: href || '', isLink: !!href, border: si === 0 ? 'none' : '1px solid var(--line-soft)' }; }).filter(Boolean);
+          return { iconId: r.id, label: r.label, value: '', hasStructuredSubs: true, subs, showCta: !!r.cta };
+        }
+        const lines = [r.sub ? r.sub(c) : null, r.sub2 ? r.sub2(c) : null].filter(Boolean);
+        return { iconId: r.id, label: r.label, value: val, hasStructuredSubs: false, subs: lines.map(t => ({ text: t })), showCta: false, isMixedFx: false };
+      }).filter(Boolean);
+      const vas = (extraOf(c).vas || []).map(v => ({
+        isText: v.kind === 'text' || !v.kind, isIcon: v.kind === 'icon', isCta: v.kind === 'cta', isImage: v.kind === 'image',
+        text: v.text, icon: v.icon || '', ctaLabel: v.ctaLabel || '', ctaHref: v.ctaHref || '#' }));
+      return { applyUrl: extraOf(c).applyUrl || '#', incomeFmt: fmtRM(c.min_income), feeFmt: fmtRM(c.annual_fee),
+        feeDetails: extraOf(c).feeDetails || c.annual_fee_details, perks, vas, hasVas: vas.length > 0,
+        onRemove: () => this.remove(c.id), onOpenMap: () => {} };
+    })() : null;
+
+    const q = search.trim().toLowerCase();
+    const picked = this.state.cardFilters || [];
+    const feeCap = FEE_STEPS[feeIdx].v, incomeCap = INCOME_STEPS[incomeIdx].v;
+    const filtered = CARDS.filter(c =>
+      (!picked.length || picked.includes(c.id)) &&
+      (!banks.length || banks.includes(bankOf(c))) && c.annual_fee <= feeCap && c.min_income <= incomeCap);
+    const bankMatches = q ? [...new Set(CARDS.map(bankOf))].filter(b => !banks.includes(b) && b.toLowerCase().includes(q))
+      .map(b => ({ bank: b, card_name: '', onClick: () => this.setState(s => ({ banks: [...s.banks, b], search: '' })) })) : [];
+    const cardMatches = q ? CARDS.filter(c => !picked.includes(c.id) && !banks.includes(bankOf(c)) &&
+      (c.card_name + ' ' + bankOf(c) + ' ' + c.tier + ' ' + c.net).toLowerCase().includes(q))
+      .map(c => ({ bank: bankOf(c), card_name: c.card_name,
+        onClick: () => this.setState(s => ({ cardFilters: [...(s.cardFilters || []), c.id], search: '' })) })) : [];
+    const focusBanks = (!q && this.state.searchFocused) ? [...new Set(CARDS.map(bankOf))].filter(b => !banks.includes(b))
+      .map(b => ({ bank: b, card_name: '', onClick: () => this.setState(s => ({ banks: [...s.banks, b], search: '' })) })) : [];
+    const suggestions = q ? [...bankMatches, ...cardMatches].slice(0, 6) : focusBanks.slice(0, 6);
+    const full = cards.length >= slotCount;
+
+    return {
+      isMobile, mobileTiles, mobileTilesRow1, mobileTilesRow2, mobileActive, mobileDialogBtn, mainPadding: isMobile ? '0 16px 60px' : '0 28px 96px',
+      titlePadding: isMobile ? '16px 0 12px' : '48px 0 12px',
+      pickerOuterPad: isMobile ? '0' : '26px',
+      pickerOverlayLeft: isPreviewMobile ? '50%' : '0', pickerOverlayWidth: isPreviewMobile ? '390px' : '100%', pickerOverlayTransform: isPreviewMobile ? 'translateX(-50%)' : 'none',
+      pickerModalStyle: isMobile
+        ? 'position:relative;width:100%;max-width:100%;height:100%;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg,#16151c,#100f16);border:none;border-radius:0;box-shadow:none'
+        : 'position:relative;width:100%;max-width:1160px;height:90vh;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg,#16151c,#100f16);border:1px solid var(--line);border-radius:20px;box-shadow:0 34px 80px rgba(0,0,0,0.6)',
+      pickerHeaderPad: isMobile ? '16px 16px 12px' : '16px 32px 14px',
+      pickerTitleFont: isMobile ? '21px' : '28px',
+      pickerCloseSize: isMobile ? '40px' : '48px',
+      pickerCloseFont: isMobile ? '18px' : '22px',
+      pickerSlotsStyle: isMobile ? 'display:flex;gap:8px;overflow-x:auto' : `display:grid;grid-template-columns:repeat(${slotCount},1fr);gap:10px`,
+      pickerSlotWidth: isMobile ? '0 0 100px' : 'initial',
+      pickerFilterGridStyle: isMobile ? 'display:flex;flex-direction:column;gap:10px' : 'display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px',
+      pickerContentPad: isMobile ? '18px 16px 24px' : '26px 32px 34px',
+      pickerCardsGridStyle: isMobile ? 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px' : 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px',
+      pickerCardPad: isMobile ? '11px' : '14px',
+      pickerCardNameFont: isMobile ? '17px' : '22px',
+      titleFontSize: isMobile ? '24px' : 'clamp(24px,3.3vw,44px)',
+      subtextFontSize: isMobile ? '14px' : '17px',
+      mainMaxWidth: isPreviewMobile ? '390px' : '1240px',
+      navSteps: NAV_STEPS,
+      slots, slotCount, totalCols: slotCount + 1, cardColSpan: slotCount,
+      incomeCells: cellsFor(c => fmtRM(c.min_income), () => 'per year'),
+      feeCells: cellsFor(c => fmtRM(c.annual_fee), c => extraOf(c).feeDetails || c.annual_fee_details),
+      perkRows: PERK_ROWS.map(r => ({ iconId: r.id, label: r.label,
+        cells: r.mixedFx ? Array.from({ length: slotCount }, (_, i) => {
+          const c = cards[i];
+          if (!c) return { has: false, missing: true, mixed: false, plain: true, isLink: false, text: '', opacity: 0.35, color: 'var(--text-faint)' };
+          const fx = extraOf(c).fx;
+          if (!fx) return { has: false, missing: true, mixed: false, plain: true, isLink: false, text: 'Not offered', opacity: 1, color: 'var(--text-dim)' };
+          return { has: false, missing: false, mixed: true, linkText: fx.provider.replace(' Calculator', ''),
+            suffix: ` plus ${fx.pct} ${bankOf(c)} fee`, href: fx.providerUrl, opacity: 1 };
+        }) : cellsFor(r.get, r.sub, null, r.sub2),
+        showCta: !!r.cta,
+        subRows: (r.subs || []).map((f, si) => ({ label: f.label, border: si === 0 ? 'none' : '1px solid var(--line-soft)',
+          cells: Array.from({ length: slotCount }, (_, i) => {
+            const c = cards[i];
+            if (!c) return { isLink: false, plain: true, text: '', href: '', opacity: 0.35, color: 'var(--text-faint)' };
+            const o = r.pick(c), val = o && o[f.key], href = f.link ? (o && o[f.link]) : null;
+            return { isLink: !!(href && val), plain: !(href && val), text: val || '', href: href || '', opacity: 1, color: 'var(--text)' };
+          }) })) })),
+      vasRows: (() => {
+
+        const maxVas = Math.max(0, ...cards.map(c => (extraOf(c).vas || []).length));
+        return Array.from({ length: maxVas }, (_, ri) => ({
+          cells: Array.from({ length: slotCount }, (_, i) => {
+            const c = cards[i];
+            if (!c) return { isText: false, isIcon: false, isCta: false, opacity: 0.35, color: 'var(--text-faint)' };
+            const item = (extraOf(c).vas || [])[ri];
+            if (!item) return { isText: false, isIcon: false, isCta: false, opacity: 1, color: 'var(--text)' };
+            return { isText: item.kind === 'text', isIcon: item.kind === 'icon', isCta: item.kind === 'cta', isImage: item.kind === 'image',
+              text: item.text, icon: item.icon || '', ctaLabel: item.ctaLabel || '', ctaHref: item.ctaHref || '#', imageId: item.imageId || '',
+              opacity: 1, color: 'var(--text)' };
+          })
+        }));
+      })(),
+      showValueAdded: true,
+      pickerOpen: this.state.pickerOpen,
+      pickerCards: filtered.map(c => {
+        const inCart = cart.includes(c.id), blocked = !inCart && full;
+        return { card_name: c.card_name, bank: bankOf(c), theme: c.theme, fg: extraOf(c).fg || c.fg,
+          incomeFmt: fmtRM(c.min_income), feeFmt: fmtRM(c.annual_fee),
+          border: inCart ? 'var(--gold)' : 'var(--line-soft)',
+          onClick: inCart ? (() => this.remove(c.id)) : (() => this.add(c.id)),
+          disabled: blocked, cursor: blocked ? 'not-allowed' : 'pointer',
+          btnLabel: inCart ? '✓ Selected' : blocked ? 'Slots full' : 'Add to compare',
+          btnBg: inCart ? 'var(--gradient-gold)' : 'transparent',
+          btnBorder: inCart ? 'var(--gold)' : blocked ? 'var(--line-soft)' : 'var(--gold)',
+          btnFg: inCart ? 'var(--on-gold)' : blocked ? 'var(--text-faint)' : 'var(--gold)' };
+      }),
+      noResults: filtered.length === 0 && banks.length === 0 && picked.length === 0,
+      showResetCard: banks.length > 0 || picked.length > 0,
+      resetFilters: () => this.setState({ banks: [], cardFilters: [] }),
+      bankChips: banks.map(b => ({ label: b, onRemove: () => this.setState(s => ({ banks: s.banks.filter(x => x !== b) })) })),
+      suggestions, showSuggest: suggestions.length > 0, noSuggest: !!q && suggestions.length === 0,
+      cardChips: picked.map(id => { const c = CARDS.find(x => x.id === id); return { label: c ? `${bankOf(c)}: ${c.card_name}` : id,
+        onRemove: () => this.setState(s => ({ cardFilters: (s.cardFilters || []).filter(x => x !== id) })) }; }),
+      searchPadRight: (banks.length + picked.length) ? '150px' : '18px',
+      feeLabel: FEE_STEPS[feeIdx].label, incomeLabel: INCOME_STEPS[incomeIdx].label,
+      feeMark: { label: FEE_STEPS[feeIdx].label,
+        style: (() => { const pct = feeIdx / (FEE_STEPS.length - 1) * 100; return `position:absolute;left:${pct}%;top:50%;transform:translate(-${pct}%,-50%);white-space:nowrap;border-radius:6px;font-weight:500;background:var(--gradient-gold);color:var(--on-gold);font-family:var(--font-serif);font-size:15px;padding:4px 10px;`; })() },
+      incomeMark: { label: INCOME_STEPS[incomeIdx].label,
+        style: (() => { const pct = incomeIdx / (INCOME_STEPS.length - 1) * 100; return `position:absolute;left:${pct}%;top:50%;transform:translate(-${pct}%,-50%);white-space:nowrap;border-radius:6px;font-weight:500;background:var(--gradient-gold);color:var(--on-gold);font-family:var(--font-serif);font-size:15px;padding:4px 10px;`; })() },
+      feeIdx, incomeIdx, search,
+      openMap: () => {},
+      openPicker: () => this.setState({ pickerOpen: true }),
+      closePicker: () => this.setState({ pickerOpen: false }),
+      onSearch: e => this.setState({ search: e.target.value }),
+      onSearchFocus: () => this.setState({ searchFocused: true }),
+      onSearchBlur: () => setTimeout(() => this.setState({ searchFocused: false }), 150),
+      onFee: e => this.setState({ feeIdx: Number(e.target.value) }),
+      onIncome: e => this.setState({ incomeIdx: Number(e.target.value) }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

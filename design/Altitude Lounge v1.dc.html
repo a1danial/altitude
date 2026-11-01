@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./ds-base.js"></script>
+<style>::placeholder{color:var(--text-dim);opacity:0.95}a{color:var(--gold)}a:hover{color:var(--gold-bright)}</style>
+</helmet>
+<div style="position:relative;min-height:100vh;background:var(--bg);display:flex;flex-direction:column">
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:var(--gradient-atmosphere)"></div>
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.04;background-image:var(--noise-svg)"></div>
+
+<main style="position:relative;z-index:1;flex:1;max-width:{{ mainMaxWidth }};width:100%;margin:0 auto;padding:{{ mainPadding }};box-sizing:border-box;display:flex;flex-direction:column;gap:28px">
+<div>
+<h1 style="font-family:var(--font-serif);font-weight:400;font-size:{{ titleFontSize }};line-height:1.1;letter-spacing:-0.01em;margin:0;color:var(--text)">Where can your cards <em style="font-style:italic;color:var(--gold-bright)">get you in?</em></h1>
+<p style="color:var(--text-dim);font-size:{{ subtextFontSize }};line-height:1.6;margin:12px 0 0;font-weight:300">Add the airports you're flying through and the cards you carry. Lounges are matched against each card's lounge network.</p>
+</div>
+
+<div style="position:relative">
+<input value="{{ search }}" onInput="{{ onSearch }}" onFocus="{{ onSearchFocus }}" onBlur="{{ onSearchBlur }}" placeholder="Search for a country, city or airport" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--line-soft);border-radius:13px;padding:16px 18px;padding-right:{{ searchPadRight }};color:var(--text);font-family:var(--font-sans);font-size:16px;font-weight:300;outline:none">
+<div style="position:absolute;right:10px;top:27px;transform:translateY(-50%);display:flex;align-items:center;gap:8px;max-width:60%;overflow-x:auto">
+<sc-for list="{{ destChips }}" as="d" hint-placeholder-count="2">
+<span style="display:inline-flex;align-items:center;gap:7px;padding:4px 6px 4px 10px;border-radius:6px;background:var(--gradient-gold);color:var(--on-gold);font-family:var(--font-serif);font-size:15px;font-weight:500;white-space:nowrap;flex-shrink:0">{{ d.label }}<button onclick="{{ d.onRemove }}" style="background:none;border:none;color:var(--on-gold);font-size:14px;line-height:1;cursor:pointer;padding:0 2px 0 0;opacity:0.75">×</button></span>
+</sc-for>
+</div>
+<sc-if value="{{ showSuggest }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:5;background:#191821;border:1px solid var(--line);border-radius:13px;overflow:hidden;box-shadow:0 20px 44px rgba(0,0,0,0.5)">
+<sc-for list="{{ suggestions }}" as="sg" hint-placeholder-count="3">
+<button onclick="{{ sg.onClick }}" style="width:100%;display:flex;align-items:center;gap:14px;text-align:left;padding:12px 17px;background:none;border:none;border-bottom:1px solid var(--line);cursor:pointer;font-family:var(--font-sans)" style-hover="background:var(--surface-2)">
+<span style="color:var(--gold);display:grid;place-items:center;flex-shrink:0;width:22px">
+<sc-if value="{{ sg.isAirport }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 21l1.5-1v-5.5l8 2.5v-2l-8-5V4.5a1.5 1.5 0 0 0-3 0V10l-8 5v2l8-2.5V20l1.5 1z" transform="translate(1.5 0)"></path></svg></sc-if>
+<sc-if value="{{ sg.isCity }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.3"></circle></svg></sc-if>
+<sc-if value="{{ sg.isCountry }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><line x1="3.5" y1="12" x2="20.5" y2="12"></line><path d="M12 3.5c2.3 2.4 3.5 5.3 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.3-3.5-8.5S9.7 5.9 12 3.5z"></path></svg></sc-if>
+</span>
+<span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+<span style="font-size:15px;font-weight:500;color:var(--text);line-height:1.3"><sc-if value="{{ sg.isAirport }}" hint-placeholder-val="{{ false }}"><span style="color:var(--gold);margin-right:6px">{{ sg.code }}</span></sc-if>{{ sg.label }}</span>
+<span style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim);font-weight:500">{{ sg.typeLabel }}</span>
+</span>
+</button>
+</sc-for>
+<sc-if value="{{ noSuggest }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 17px;font-size:13px;color:var(--text-faint);font-weight:300">No matches</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+<aside style="flex:1 1 280px;max-width:{{ asideMaxWidth }};display:flex;flex-direction:column;gap:10px;position:{{ stickyPos }};top:0;padding-top:20px;margin-top:-20px;max-height:{{ asideMaxHeight }};overflow-y:auto;box-sizing:border-box;scrollbar-width:none">
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 2px 4px">
+<span style="white-space:nowrap;font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);font-weight:500">Your cards</span>
+<span style="font-size:12px;color:var(--text-dim);font-weight:300">{{ cardCount }}</span>
+</div>
+<sc-for list="{{ cardTiles }}" as="c" hint-placeholder-count="2">
+<div style="position:relative;border-radius:13px;padding:14px 14px 14px;border:1px solid rgba(255,255,255,0.1);box-shadow:var(--shadow-card-lg);background:{{ c.theme }};color:{{ c.fg }};display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+<div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+<span style="font-family:var(--font-serif);font-size:20px;line-height:1.15">{{ c.card_name }}</span>
+<span style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.9">{{ c.bank }}</span>
+</div>
+<button onclick="{{ c.onRemove }}" style="background:none;border:none;color:{{ c.fg }};font-size:20px;line-height:1;cursor:pointer;padding:2px 4px;opacity:0.75">×</button>
+</div>
+<div style="display:flex;flex-direction:column;gap:2px;font-size:13px;font-weight:300;line-height:1.45">
+<span>{{ c.line }}</span>
+<span style="opacity:0.8">{{ c.available }}</span>
+</div>
+</div>
+</sc-for>
+<sc-if value="{{ noCards }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px dashed var(--line);border-radius:13px;padding:22px;text-align:center;font-size:13.5px;color:var(--text-dim);font-weight:300">No cards added</div>
+</sc-if>
+<sc-if value="{{ canAdd }}" hint-placeholder-val="{{ true }}">
+<button onclick="{{ toggleAdd }}" style="display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--font-sans);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;font-weight:500;color:var(--gold);background:rgba(201,169,106,0.05);border:1px solid var(--gold);padding:14px 18px;border-radius:13px;cursor:pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.2"></rect><line x1="3" y1="10.5" x2="21" y2="10.5"></line></svg>
+Select card</button>
+</sc-if>
+</aside>
+
+<section style="flex:999 1 520px;min-width:0;display:flex;flex-direction:column;gap:14px">
+<div ref="{{ headRef }}" style="position:{{ stickyPos }};top:0;z-index:3;margin:-20px 0 0;padding:20px 2px 12px;border-bottom:1px solid var(--line-soft);background:{{ headBg }};backdrop-filter:{{ headBlur }};-webkit-backdrop-filter:{{ headBlur }};transition:background .2s ease">
+<h2 style="font-family:var(--font-serif);font-weight:400;font-size:26px;margin:0;color:var(--text)">Lounges</h2>
+</div>
+
+<sc-for list="{{ lounges }}" as="l" hint-placeholder-count="3">
+<article style="border:1px solid {{ l.border }};border-radius:16px;background:var(--surface);padding:20px 22px;display:flex;flex-direction:column;gap:14px;opacity:{{ l.opacity }}">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+<div style="flex:1 1 260px;display:flex;flex-direction:column;gap:8px;min-width:0">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+<span style="white-space:nowrap;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);font-weight:500;border:1px solid var(--line);border-radius:6px;padding:4px 8px">{{ l.tag }}</span>
+<span style="font-size:13.5px;color:var(--text-dim);font-weight:300">{{ l.location }}</span>
+</div>
+<h3 style="font-family:var(--font-serif);font-weight:400;font-size:22px;line-height:1.2;margin:0;color:var(--text)">{{ l.name }}</h3>
+</div>
+<div style="flex-shrink:0;white-space:nowrap;display:flex;align-items:center;gap:8px;color:var(--text-dim);font-size:13.5px;font-weight:300;padding-top:2px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)"><circle cx="12" cy="12" r="8.5"></circle><polyline points="12 7.5 12 12 15 14"></polyline></svg>
+{{ l.hours }}
+</div>
+</div>
+<div style="border-top:1px solid var(--line-soft);padding-top:12px;display:flex;flex-direction:column;gap:6px">
+<sc-for list="{{ l.access }}" as="a" hint-placeholder-count="1">
+<div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.45;font-weight:300">
+<span style="color:var(--gold);flex-shrink:0;margin-top:2px">
+<x-import component-from-global-scope="AltitudeDesignSystem_346325.CheckIcon" size="{{ 13 }}" hint-size="13px,13px"></x-import>
+</span>
+<span style="flex:1;min-width:0;color:var(--text)">{{ a.card }} <span style="color:var(--text-dim)">· {{ a.visits }}</span></span>
+</div>
+</sc-for>
+<sc-if value="{{ l.none }}" hint-placeholder-val="{{ false }}">
+<span style="font-size:13.5px;color:var(--text-dim);font-weight:300">Not covered by your cards</span>
+</sc-if>
+</div>
+</article>
+</sc-for>
+
+<sc-if value="{{ noLounges }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px dashed var(--line);border-radius:16px;padding:48px;text-align:center">
+<div style="font-family:var(--font-serif);font-size:20px;color:var(--text)">{{ emptyTitle }}</div>
+<p style="font-size:13.5px;color:var(--text-dim);font-weight:300;margin:8px 0 0">{{ emptyBody }}</p>
+</div>
+</sc-if>
+</section>
+</div>
+</main>
+<sc-if value="{{ pickerOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;top:0;bottom:0;left:{{ pickerOverlayLeft }};width:{{ pickerOverlayWidth }};transform:{{ pickerOverlayTransform }};z-index:200;display:grid;place-items:center;padding:{{ pickerOuterPad }};box-sizing:border-box">
+<div onclick="{{ closePicker }}" style="position:absolute;inset:0;background:rgba(10,9,13,0.8);backdrop-filter:blur(18px)"></div>
+<div style="{{ pickerModalStyle }}">
+<header style="padding:{{ pickerHeaderPad }};border-bottom:1px solid var(--line-soft);display:flex;flex-direction:column;gap:14px;flex-shrink:0">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px">
+<div>
+<h2 style="font-family:var(--font-serif);font-weight:400;font-size:{{ pickerTitleFont }};margin:0;color:var(--text)">Select your cards</h2>
+</div>
+<button onclick="{{ closePicker }}" style="background:none;border:1px solid var(--line-soft);color:var(--gold);width:{{ pickerCloseSize }};height:{{ pickerCloseSize }};border-radius:50%;cursor:pointer;font-size:{{ pickerCloseFont }};flex-shrink:0">×</button>
+</div>
+<div style="{{ pickerSlotsStyle }}">
+<sc-for list="{{ slots }}" as="s" hint-placeholder-count="5">
+<div style="flex:{{ pickerSlotWidth }};border-radius: 12px; padding: 8px 13px; height: 70px; display: flex; flex-direction: column; justify-content: center; gap: 6px; background: {{ s.stripBg }}; border: 1px {{ s.stripBorderStyle }} {{ s.stripBorder }}">
+<sc-if value="{{ s.filled }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+<div style="display:flex;flex-direction:column;gap:3px">
+<span style="font-family:var(--font-serif);font-size:15px;line-height:1.15;color:{{ s.stripFg }}">{{ s.stripName }}</span>
+<span style="font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:{{ s.stripMetaFg }};opacity:0.9">{{ s.stripMeta }}</span>
+</div>
+<button onclick="{{ s.onRemove }}" style="background:none;border:none;color:{{ s.stripFg }};font-size:22px;line-height:1;cursor:pointer;padding:6px;opacity:0.75;flex-shrink:0">×</button>
+</div>
+</sc-if>
+<sc-if value="{{ s.empty }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;justify-content:center;text-align:center">
+<span style="font-family:var(--font-sans);font-size:13px;font-weight:300;color:var(--text-dim)">{{ s.stripName }}</span>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<div style="position:relative">
+<input value="{{ pkSearch }}" onInput="{{ onPkSearch }}" onFocus="{{ onPkFocus }}" onBlur="{{ onPkBlur }}" placeholder="Search for a card or bank" style="width:100%;background:var(--surface);border:1px solid var(--line-soft);border-radius:13px;padding:16px 18px;padding-right:{{ pkPadRight }};color:var(--text);font-family:var(--font-sans);font-size:16px;font-weight:300;outline:none">
+<div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;max-width:60%;overflow-x:auto">
+<sc-for list="{{ bankChips }}" as="b" hint-placeholder-count="0">
+<span style="display:inline-flex;align-items:center;gap:7px;padding:4px 6px 4px 10px;border-radius:6px;background:var(--gradient-gold);color:var(--on-gold);font-family:var(--font-serif);font-size:15px;font-weight:500;white-space:nowrap;flex-shrink:0">{{ b.label }}<button onclick="{{ b.onRemove }}" style="background:none;border:none;color:var(--on-gold);font-size:14px;line-height:1;cursor:pointer;padding:0 2px 0 0;opacity:0.75">×</button></span>
+</sc-for>
+<sc-for list="{{ cardChips }}" as="k" hint-placeholder-count="0">
+<span style="display:inline-flex;align-items:center;gap:7px;padding:4px 6px 4px 10px;border-radius:6px;background:var(--gradient-gold);color:var(--on-gold);font-family:var(--font-serif);font-size:15px;font-weight:500;white-space:nowrap;flex-shrink:0">{{ k.label }}<button onclick="{{ k.onRemove }}" style="background:none;border:none;color:var(--on-gold);font-size:14px;line-height:1;cursor:pointer;padding:0 2px 0 0;opacity:0.75">×</button></span>
+</sc-for>
+</div>
+<sc-if value="{{ pkShowSuggest }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:5;background:#191821;border:1px solid var(--line);border-radius:13px;overflow:hidden;box-shadow:0 20px 44px rgba(0,0,0,0.5)">
+<sc-for list="{{ pkSuggestions }}" as="sg" hint-placeholder-count="3">
+<button onclick="{{ sg.onClick }}" style="width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 17px;background:none;border:none;border-bottom:1px solid var(--line-soft);cursor:pointer;font-family:var(--font-sans);white-space:nowrap">
+<span style="font-family:var(--font-sans);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);font-weight:500">{{ sg.bank }}</span>
+<sc-if value="{{ sg.card_name }}" hint-placeholder-val="{{ true }}"><span style="font-family:var(--font-serif);font-size:15px;color:var(--text);font-weight:400">{{ sg.card_name }}</span></sc-if>
+</button>
+</sc-for>
+<sc-if value="{{ pkNoSuggest }}" hint-placeholder-val="{{ false }}">
+<div style="padding:14px 17px;font-size:13px;color:var(--text-faint);font-weight:300">No matches</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+<div style="{{ pickerFilterGridStyle }}">
+<div style="display:grid;grid-template-columns:96px 1fr;gap:4px;align-items:center;border:1px solid var(--line-soft);border-radius:13px;padding:15px 17px;background:var(--surface)">
+<div style="font-family:var(--font-sans);font-size:15px;font-weight:400;color:var(--text);line-height:1.3">Annual<br>fee</div>
+<div style="position:relative;height:34px;padding:0;box-sizing:border-box">
+<input type="range" min="0" max="3" step="1" value="{{ feeIdx }}" onChange="{{ onFee }}" style="width:100%;position:absolute;top:50%;left:0;transform:translateY(-50%);margin:0;accent-color:var(--gold);background:transparent;z-index:1">
+<div style="position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:2;overflow:hidden">
+<span style="{{ feeMark.style }}">{{ feeMark.label }}</span>
+</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:96px 1fr;gap:4px;align-items:center;border:1px solid var(--line-soft);border-radius:13px;padding:15px 17px;background:var(--surface)">
+<div style="font-family:var(--font-sans);font-size:15px;font-weight:400;color:var(--text);line-height:1.3">Minimum<br>income</div>
+<div style="position:relative;height:34px;padding:0;box-sizing:border-box">
+<input type="range" min="0" max="3" step="1" value="{{ incomeIdx }}" onChange="{{ onIncome }}" style="width:100%;position:absolute;top:50%;left:0;transform:translateY(-50%);margin:0;accent-color:var(--gold);background:transparent;z-index:1">
+<div style="position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:2;overflow:hidden">
+<span style="{{ incomeMark.style }}">{{ incomeMark.label }}</span>
+</div>
+</div>
+</div>
+</div></header>
+<div style="padding:{{ pickerContentPad }};position:relative;overflow-y:auto;flex:1;min-height:0">
+<div style="{{ pickerCardsGridStyle }}">
+<sc-for list="{{ pickerCards }}" as="p" hint-placeholder-count="6">
+<div style="border:1px solid {{ p.border }};border-radius:16px;padding:{{ pickerCardPad }};overflow:hidden;display:flex;flex-direction:column;gap:12px;background:{{ p.theme }};color:{{ p.fg }}">
+<div style="display:flex;flex-direction:column;gap:4px">
+<div style="font-family:var(--font-serif);font-size:{{ pickerCardNameFont }};line-height:1.15">{{ p.card_name }}</div>
+<div style="font-size:11.5px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.9">{{ p.bank }}</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:14.5px;font-weight:300"><span style="opacity:0.85">Min. income</span><span style="font-family:var(--font-serif);font-size:16px;font-weight:400">{{ p.incomeFmt }}</span></div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:14.5px;font-weight:300"><span style="opacity:0.85">Annual fee</span><span style="font-family:var(--font-serif);font-size:16px;font-weight:400">{{ p.feeFmt }}</span></div>
+</div>
+<button onclick="{{ p.onClick }}" disabled="{{ p.disabled }}" style="width:100%;font-family:var(--font-sans);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;font-weight:500;padding:10px 0;border-radius:999px;cursor:{{ p.cursor }};background:{{ p.btnBg }};border:1px solid {{ p.btnBorder }};color:{{ p.btnFg }}">{{ p.btnLabel }}</button>
+</div>
+</sc-for>
+<sc-if value="{{ showResetCard }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px dashed var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;min-height:180px">
+<div style="font-size:13.5px;color:var(--text-dim);font-weight:300">Not seeing the right cards?</div>
+<button onclick="{{ resetFilters }}" style="font-family:var(--font-sans);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;font-weight:500;padding:14px 22px;border-radius:999px;cursor:pointer;background:transparent;border:1px solid var(--gold);color:var(--gold)">Reset filters</button>
+</div>
+</sc-if>
+</div>
+<sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px dashed var(--line);border-radius:16px;padding:48px;text-align:center">
+<div style="font-family:var(--font-serif);font-size:20px;color:var(--text)">No cards match these filters</div>
+<p style="font-size:13.5px;color:var(--text-dim);font-weight:300;margin:8px 0 0">Widen the fee or salary range, or clear the bank filter.</p>
+</div>
+</sc-if>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;preview&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Full&quot;,&quot;options&quot;:[&quot;Full&quot;,&quot;Mobile&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Preview&quot;},&quot;showUncovered&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Lounges&quot;}}">
+const AIRPORTS = [
+  {code:'KUL', name:'Kuala Lumpur International Airport', city:'Kuala Lumpur', country:'Malaysia'},
+  {code:'PEN', name:'Penang International Airport', city:'Penang', country:'Malaysia'},
+  {code:'SIN', name:'Singapore Changi Airport', city:'Singapore', country:'Singapore'},
+  {code:'LHR', name:'London Heathrow Airport', city:'London', country:'United Kingdom'},
+  {code:'LGW', name:'London Gatwick Airport', city:'London', country:'United Kingdom'},
+  {code:'HKG', name:'Hong Kong International Airport', city:'Hong Kong', country:'Hong Kong'},
+  {code:'BKK', name:'Suvarnabhumi Airport', city:'Bangkok', country:'Thailand'},
+];
+const uniq = xs => [...new Set(xs)];
+const PLACES = [
+  ...uniq(AIRPORTS.map(a => a.country)).map(c => ({ key:'country:' + c, type:'country', kind:'Country', label:c, chip:c, context:'',
+    codes: AIRPORTS.filter(a => a.country === c).map(a => a.code) })),
+  ...uniq(AIRPORTS.map(a => a.city + '|' + a.country)).map(s => { const [city, country] = s.split('|');
+    return { key:'city:' + city, type:'city', kind:'City', label:city, chip:city, context: city === country ? '' : country,
+      codes: AIRPORTS.filter(a => a.city === city).map(a => a.code) }; }),
+  ...AIRPORTS.map(a => ({ key:'airport:' + a.code, type:'airport', kind:a.code, label:a.name, chip:`${a.name} (${a.code})`,
+    context:`${a.city}, ${a.country}`, codes:[a.code] })),
+];
+const placeOf = k => PLACES.find(p => p.key === k);
+// net: pp = Priority Pass, apac = Plaza Premium Asia-Pacific, my = Plaza Premium Malaysia
+const CARDS = [
+  {id:'aurora-infinite', bank:'Aurora', card_name:'Infinite', tier:'Invitation Only', net:'World Elite', min_income:600000, annual_fee:3180, nets:['pp'], via:'Priority Pass',
+   theme:'linear-gradient(135deg,rgba(233,199,120,0) 0%,rgba(233,199,120,0.24) 50%,rgba(233,199,120,0) 100%),#100d07', fg:'#ecdcb4',
+   lounge:{visits:'Unlimited visits',access:'Cardholder + unlimited guests',network:'1,300+ lounges worldwide · Priority Pass Select'}},
+  {id:'aurora-reserve', bank:'Aurora', card_name:'Reserve', tier:'Reserve', net:'Signature', min_income:150000, annual_fee:800, nets:['apac','my'], via:'Plaza Premium',
+   theme:'linear-gradient(135deg,rgba(214,150,104,0) 0%,rgba(214,150,104,0.2) 50%,rgba(214,150,104,0) 100%),#140c08', fg:'#ecd6bf',
+   lounge:{visits:'6 visits / year',access:'Cardholder only',network:'25 Plaza Premium Lounges · Asia-Pacific'}},
+  {id:'meridian-infinite', bank:'Meridian', card_name:'Infinite', tier:'Infinite', net:'World Elite', min_income:400000, annual_fee:2000, nets:['pp'], via:'Priority Pass',
+   theme:'linear-gradient(135deg,#1b3a6b 0%,#7a1f2b 100%)', fg:'#f0e2e4',
+   lounge:{visits:'Unlimited visits',access:'Cardholder + 2 guests',network:'1,300+ lounges · Priority Pass'}},
+  {id:'meridian-world', bank:'Meridian', card_name:'World', tier:'World', net:'World', min_income:200000, annual_fee:1080, nets:[], via:'',
+   theme:'linear-gradient(135deg,rgba(120,206,170,0) 0%,rgba(120,206,170,0.18) 50%,rgba(120,206,170,0) 100%),#08130f', fg:'#cfe6da',
+   lounge:{visits:'No lounge access',access:'',network:''}},
+  {id:'horizon-world-elite', bank:'Horizon Bank', card_name:'World Elite', tier:'World Elite', net:'World Elite', min_income:120000, annual_fee:600, nets:['my'], via:'Plaza Premium',
+   theme:'linear-gradient(135deg,rgba(130,168,232,0) 0%,rgba(130,168,232,0.2) 50%,rgba(130,168,232,0) 100%),#080d18', fg:'#cdd9ee',
+   lounge:{visits:'4 visits / year',access:'Cardholder only',network:'Plaza Premium Lounges · Malaysia'}},
+];
+const LOUNGES = [
+  {code:'KUL', terminal:'Terminal 1', name:'Plaza Premium Lounge', location:'Airside, Contact Pier', hours:'Open 24 hours', nets:['pp','apac','my']},
+  {code:'KUL', terminal:'Terminal 1', name:'Travel Club Lounge', location:'Airside, Satellite Building', hours:'05:00 – 01:00', nets:['pp']},
+  {code:'KUL', terminal:'Terminal 2', name:'Plaza Premium Lounge', location:'Airside, International Departures', hours:'Open 24 hours', nets:['pp','apac','my']},
+  {code:'SIN', terminal:'Terminal 1', name:'SATS Premier Lounge', location:'Airside, Level 3', hours:'Open 24 hours', nets:['pp']},
+  {code:'SIN', terminal:'Terminal 3', name:'Marhaba Lounge', location:'Airside, Level 3', hours:'Open 24 hours', nets:['pp']},
+  {code:'LHR', terminal:'Terminal 2', name:'Plaza Premium Lounge', location:'Airside, Departures Level 4', hours:'05:00 – 21:30', nets:['pp']},
+  {code:'LHR', terminal:'Terminal 3', name:'No1 Lounge', location:'Airside, near Gate 7', hours:'05:00 – 22:00', nets:['pp']},
+  {code:'HKG', terminal:'Terminal 1', name:'Plaza Premium Lounge', location:'Airside, near Gate 35', hours:'Open 24 hours', nets:['pp','apac']},
+  {code:'PEN', terminal:'Main Terminal', name:'Plaza Premium Lounge', location:'Airside, International Departures', hours:'06:00 – 23:00', nets:['pp','apac','my']},
+  {code:'LGW', terminal:'North Terminal', name:'No1 Lounge', location:'Airside, near Gate 101', hours:'04:30 – 21:00', nets:['pp']},
+  {code:'BKK', terminal:'Main Terminal', name:'Miracle First Class Lounge', location:'Airside, Concourse D', hours:'Open 24 hours', nets:['pp']},
+];
+const FEE_STEPS = [{v:0,label:'No fee'},{v:300,label:'RM300'},{v:600,label:'RM600'},{v:Infinity,label:'Any fee'}];
+const INCOME_STEPS = [{v:20000,label:'RM 20k'},{v:50000,label:'RM 50k'},{v:100000,label:'RM 100k'},{v:Infinity,label:'Any income'}];
+const fmtRM = n => 'RM ' + n.toLocaleString('en-MY');
+const markStyle = (i, n) => { const pct = i / (n - 1) * 100; return `position:absolute;left:${pct}%;top:50%;transform:translate(-${pct}%,-50%);white-space:nowrap;border-radius:6px;font-weight:500;background:var(--gradient-gold);color:var(--on-gold);font-family:var(--font-serif);font-size:15px;padding:4px 10px;`; };
+const SLOT_COUNT = 5;
+const joinList = xs => xs.length <= 1 ? xs.join('') : xs.slice(0, -1).join(', ') + ' & ' + xs[xs.length - 1];
+
+class Component extends DCLogic {
+  state = { dests: ['city:Kuala Lumpur','country:Singapore'], cards: ['aurora-reserve','meridian-infinite'], search: '', focused: false,
+    pickerOpen: false, pkSearch: '', pkFocused: false, banks: [], cardFilters: [], feeIdx: 3, incomeIdx: 3,
+    viewportWidth: (typeof window !== 'undefined' ? window.innerWidth : 1280) };
+  removeCard = id => this.setState(s => ({ cards: s.cards.filter(x => x !== id) }));
+  addCard = id => this.setState(s => s.cards.includes(id) || s.cards.length >= SLOT_COUNT ? s : ({ cards: [...s.cards, id] }));
+
+  headRef = React.createRef();
+  componentDidMount() {
+    this.onScroll = () => { const el = this.headRef.current; if (!el) return;
+      const stuck = el.getBoundingClientRect().top <= 0.5 && window.scrollY > 0;
+      if (stuck !== !!this.state.stuck) this.setState({ stuck }); };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.onResize = () => this.setState({ viewportWidth: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+    this.onScroll();
+  }
+  componentDidUpdate() {
+    const lock = this.state.pickerOpen ? 'hidden' : '';
+    if (document.documentElement.style.overflow !== lock) { document.documentElement.style.overflow = lock; document.body.style.overflow = lock; }
+  }
+  componentWillUnmount() { document.documentElement.style.overflow = ''; document.body.style.overflow = ''; window.removeEventListener('scroll', this.onScroll); window.removeEventListener('resize', this.onResize); }
+  pickerVals(cart, cards) {
+    const { banks, feeIdx, incomeIdx, pkSearch } = this.state;
+    const isPreviewMobile = (this.props.preview ?? 'Full') === 'Mobile';
+    const isMobile = isPreviewMobile || this.state.viewportWidth < 768;
+    const slotCount = SLOT_COUNT;
+    const slots = Array.from({ length: slotCount }, (_, i) => {
+      const c = cards[i];
+      if (!c) return { filled: false, empty: true, stripBg: 'rgba(255,255,255,0.02)', stripBorder: 'var(--line)', stripBorderStyle: 'dashed', stripFg: 'var(--text-faint)', stripMetaFg: 'var(--text-faint)', stripName: 'Select below' };
+      return { filled: true, empty: false, onRemove: () => this.removeCard(c.id), stripBg: c.theme, stripBorder: 'rgba(255,255,255,0.14)', stripBorderStyle: 'solid', stripFg: c.fg, stripMetaFg: c.fg, stripMeta: c.bank, stripName: c.card_name };
+    });
+    const q = pkSearch.trim().toLowerCase();
+    const picked = this.state.cardFilters || [];
+    const feeCap = FEE_STEPS[feeIdx].v, incomeCap = INCOME_STEPS[incomeIdx].v;
+    const filtered = CARDS.filter(c => (!picked.length || picked.includes(c.id)) && (!banks.length || banks.includes(c.bank)) && c.annual_fee <= feeCap && c.min_income <= incomeCap);
+    const allBanks = [...new Set(CARDS.map(c => c.bank))];
+    const bankPick = b => ({ bank: b, card_name: '', onClick: () => this.setState(s => ({ banks: [...s.banks, b], pkSearch: '' })) });
+    const bankMatches = q ? allBanks.filter(b => !banks.includes(b) && b.toLowerCase().includes(q)).map(bankPick) : [];
+    const cardMatches = q ? CARDS.filter(c => !picked.includes(c.id) && !banks.includes(c.bank) && (c.card_name + ' ' + c.bank + ' ' + c.tier + ' ' + c.net).toLowerCase().includes(q))
+      .map(c => ({ bank: c.bank, card_name: c.card_name, onClick: () => this.setState(s => ({ cardFilters: [...(s.cardFilters || []), c.id], pkSearch: '' })) })) : [];
+    const focusBanks = (!q && this.state.pkFocused) ? allBanks.filter(b => !banks.includes(b)).map(bankPick) : [];
+    const pkSuggestions = q ? [...bankMatches, ...cardMatches].slice(0, 6) : focusBanks.slice(0, 6);
+    const full = cards.length >= slotCount;
+    return {
+      pickerOpen: this.state.pickerOpen,
+      closePicker: () => this.setState({ pickerOpen: false }),
+      pickerOuterPad: isMobile ? '0' : '26px',
+      pickerOverlayLeft: isPreviewMobile ? '50%' : '0', pickerOverlayWidth: isPreviewMobile ? '390px' : '100%', pickerOverlayTransform: isPreviewMobile ? 'translateX(-50%)' : 'none',
+      pickerModalStyle: isMobile
+        ? 'position:relative;width:100%;max-width:100%;height:100%;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg,#16151c,#100f16);border:none;border-radius:0;box-shadow:none'
+        : 'position:relative;width:100%;max-width:1160px;height:90vh;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg,#16151c,#100f16);border:1px solid var(--line);border-radius:20px;box-shadow:0 34px 80px rgba(0,0,0,0.6)',
+      pickerHeaderPad: isMobile ? '16px 16px 12px' : '16px 32px 14px',
+      pickerTitleFont: isMobile ? '21px' : '28px',
+      pickerCloseSize: isMobile ? '40px' : '48px',
+      pickerCloseFont: isMobile ? '18px' : '22px',
+      pickerSlotsStyle: isMobile ? 'display:flex;gap:8px;overflow-x:auto' : `display:grid;grid-template-columns:repeat(${slotCount},1fr);gap:10px`,
+      pickerSlotWidth: isMobile ? '0 0 100px' : 'initial',
+      pickerFilterGridStyle: isMobile ? 'display:flex;flex-direction:column;gap:10px' : 'display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px',
+      pickerContentPad: isMobile ? '18px 16px 24px' : '26px 32px 34px',
+      pickerCardsGridStyle: isMobile ? 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px' : 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px',
+      pickerCardPad: isMobile ? '11px' : '14px',
+      pickerCardNameFont: isMobile ? '17px' : '22px',
+      slots,
+      pickerCards: filtered.map(c => {
+        const inCart = cart.includes(c.id), blocked = !inCart && full;
+        return { card_name: c.card_name, bank: c.bank, theme: c.theme, fg: c.fg, incomeFmt: fmtRM(c.min_income), feeFmt: fmtRM(c.annual_fee),
+          border: inCart ? 'var(--gold)' : 'var(--line-soft)',
+          onClick: inCart ? (() => this.removeCard(c.id)) : (() => this.addCard(c.id)),
+          disabled: blocked, cursor: blocked ? 'not-allowed' : 'pointer',
+          btnLabel: inCart ? '✓ Selected' : blocked ? 'Slots full' : 'Add card',
+          btnBg: inCart ? 'var(--gradient-gold)' : 'transparent',
+          btnBorder: inCart ? 'var(--gold)' : blocked ? 'var(--line-soft)' : 'var(--gold)',
+          btnFg: inCart ? 'var(--on-gold)' : blocked ? 'var(--text-faint)' : 'var(--gold)' };
+      }),
+      noResults: filtered.length === 0 && banks.length === 0 && picked.length === 0,
+      showResetCard: banks.length > 0 || picked.length > 0,
+      resetFilters: () => this.setState({ banks: [], cardFilters: [] }),
+      bankChips: banks.map(b => ({ label: b, onRemove: () => this.setState(s => ({ banks: s.banks.filter(x => x !== b) })) })),
+      cardChips: picked.map(id => { const c = CARDS.find(x => x.id === id); return { label: c ? `${c.bank}: ${c.card_name}` : id,
+        onRemove: () => this.setState(s => ({ cardFilters: (s.cardFilters || []).filter(x => x !== id) })) }; }),
+      pkSuggestions, pkShowSuggest: pkSuggestions.length > 0, pkNoSuggest: !!q && pkSuggestions.length === 0,
+      pkPadRight: (banks.length + picked.length) ? '150px' : '18px',
+      pkSearch,
+      onPkSearch: e => this.setState({ pkSearch: e.target.value }),
+      onPkFocus: () => this.setState({ pkFocused: true }),
+      onPkBlur: () => setTimeout(() => this.setState({ pkFocused: false }), 150),
+      feeIdx, incomeIdx,
+      feeMark: { label: FEE_STEPS[feeIdx].label, style: markStyle(feeIdx, FEE_STEPS.length) },
+      incomeMark: { label: INCOME_STEPS[incomeIdx].label, style: markStyle(incomeIdx, INCOME_STEPS.length) },
+      onFee: e => this.setState({ feeIdx: Number(e.target.value) }),
+      onIncome: e => this.setState({ incomeIdx: Number(e.target.value) }),
+    };
+  }
+  renderVals() {
+    const { dests, cards: cardIds, search, focused, banks, feeIdx, incomeIdx, pkSearch } = this.state;
+    const isMobile = (this.props.preview ?? 'Full') === 'Mobile';
+    const showAll = this.props.showUncovered ?? true;
+    const cards = cardIds.map(id => CARDS.find(c => c.id === id)).filter(Boolean);
+    const q = search.trim().toLowerCase();
+    const open = q || focused;
+    const match = p => p.type === 'airport'
+      ? (p.kind.toLowerCase() === q || (p.label + ' ' + p.context).toLowerCase().includes(q))
+      : p.label.toLowerCase().includes(q);
+    const ORDER = { airport: 0, city: 1, country: 2 };
+    const suggestions = open ? PLACES.filter(p => !dests.includes(p.key) && (!q || match(p)))
+      .sort((a, b) => ORDER[a.type] - ORDER[b.type]).slice(0, 8)
+      .map(p => ({ isAirport: p.type === 'airport', isCity: p.type === 'city', isCountry: p.type === 'country',
+        code: p.type === 'airport' ? p.kind : '', typeLabel: p.type,
+        label: p.type === 'city' && p.context ? `${p.label}, ${p.context}` : p.label,
+        onClick: () => this.setState(s => ({ dests: [...s.dests, p.key], search: '' })) })) : [];
+    const selected = dests.map(placeOf).filter(Boolean);
+    const codes = new Set(selected.flatMap(p => p.codes));
+
+    const inDest = LOUNGES.filter(l => codes.has(l.code));
+    const rows = inDest.map(l => {
+      const access = cards.filter(c => c.nets.some(n => l.nets.includes(n)))
+        .map(c => ({ card: `${c.bank} ${c.card_name}`, visits: c.lounge.visits.toLowerCase(), via: c.via }));
+      return { l, access };
+    }).sort((a, b) => (b.access.length > 0) - (a.access.length > 0));
+    const covered = rows.filter(r => r.access.length).length;
+    const shown = showAll ? rows : rows.filter(r => r.access.length);
+    const cities = joinList(selected.map(p => p.type === 'airport' ? p.kind : p.label));
+
+    return {
+      mainMaxWidth: isMobile ? '390px' : '1240px',
+      mainPadding: isMobile ? '16px 16px 60px' : '48px 28px 96px',
+      titleFontSize: isMobile ? '24px' : 'clamp(24px,3.3vw,44px)',
+      subtextFontSize: isMobile ? '14px' : '17px',
+      asideMaxWidth: isMobile ? '100%' : '340px',
+      stickyPos: isMobile ? 'static' : 'sticky',
+      headRef: this.headRef,
+      headBg: this.state.stuck && !isMobile ? 'rgba(12,11,15,0.86)' : 'transparent',
+      headBlur: this.state.stuck && !isMobile ? 'blur(18px)' : 'none',
+      asideMaxHeight: isMobile ? 'none' : '100vh',
+      search,
+      onSearch: e => this.setState({ search: e.target.value }),
+      onSearchFocus: () => this.setState({ focused: true }),
+      onSearchBlur: () => setTimeout(() => this.setState({ focused: false }), 150),
+      suggestions, showSuggest: !!open && (suggestions.length > 0 || !!q), noSuggest: !!q && suggestions.length === 0,
+      destChips: selected.map(p => ({ label: p.type === 'airport' ? p.kind : p.chip, onRemove: () => this.setState(s => ({ dests: s.dests.filter(x => x !== p.key) })) })),
+      searchPadRight: selected.length ? '150px' : '18px',
+      cardCount: `${cards.length} added`,
+      cardTiles: cards.map(c => ({ ...c, ...c.lounge, line: c.lounge.access ? `${c.lounge.visits} · ${c.lounge.access}` : c.lounge.visits,
+        available: (n => `${n} lounge${n === 1 ? '' : 's'} available`)(inDest.filter(l => c.nets.some(x => l.nets.includes(x))).length),
+        onRemove: () => this.setState(s => ({ cards: s.cards.filter(x => x !== c.id) })) })),
+      noCards: cards.length === 0,
+      canAdd: true,
+      toggleAdd: () => this.setState({ pickerOpen: true }),
+      ...this.pickerVals(cardIds, cards),
+      summary: !dests.length ? 'Add an airport to see its lounges.'
+        : `${covered} of ${rows.length} lounges in ${cities} are covered by your cards.`,
+      lounges: shown.map(({ l, access }) => ({ tag: `${l.code} · ${l.terminal}`, name: l.name, location: l.location, hours: l.hours,
+        access, none: access.length === 0, opacity: access.length ? 1 : 0.55,
+        border: access.length ? 'var(--line)' : 'var(--line-soft)' })),
+      noLounges: shown.length === 0,
+      emptyTitle: !dests.length ? 'No airports selected' : 'No covered lounges',
+      emptyBody: !dests.length ? 'Search for a city or airport code above.' : 'None of your cards cover lounges at these airports.',
+    };
+  }
+}
+</script>
+</body>
+</html>
