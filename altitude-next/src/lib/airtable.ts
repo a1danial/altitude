@@ -1,4 +1,5 @@
-import type { Perk, Card, CardPerks, Lounge } from './data';
+import type { Card, Lounge, LoungePerks, InsurancePerks, CurtailPerks } from './data';
+import { parseVasList } from './vas';
 
 interface AirtableRecord {
   id: string;
@@ -27,87 +28,115 @@ export async function atFetchAll(table: string): Promise<AirtableRecord[]> {
   return records;
 }
 
-export function transformPerks(records: AirtableRecord[]): Perk[] {
-  return records.map(r => {
-    const f = r.fields;
-    return {
-      id:   String(f.id   ?? ''),
-      name: String(f.name ?? ''),
-      pop:  Number(f.pop  ?? 0),
-      desc: String(f.desc ?? ''),
-    };
-  });
+/** "TBC" and "Unavailable" are both not-yet-researched/not-offered sentinels — treat as blank everywhere */
+function blank(v: unknown): string | null {
+  const s = typeof v === 'string' ? v.trim() : '';
+  if (!s || s === 'TBC' || s === 'Unavailable') return null;
+  return s;
+}
+
+function blankNum(v: unknown): number | null {
+  return typeof v === 'number' ? v : null;
 }
 
 export function transformCards(records: AirtableRecord[]): Card[] {
   return records.map(r => {
-    const f = r.fields as Record<string, unknown>;
-    const perks: CardPerks = {};
+    const f = r.fields;
 
-    if (f.lounge_visits) {
-      perks.lounge = {
-        visits:    (f.lounge_visits    as string) ?? null,
-        access:    (f.lounge_access    as string) ?? null,
-        condition: (f.lounge_condition as string) ?? null,
-        network:   (f.lounge_network   as string) ?? null,
-      };
-    }
-
-    perks.insurance = {
-      disruptions: (f['travel_insurance_disruptions'] as string) ?? null,
-      medical:     (f['travel_insurance_medical']     as string) ?? null,
-      accident:    (f['travel_insurance_accident']    as string) ?? null,
-      condition:   (f['travel_insurance_condition']   as string) ?? null,
-      underwriter: (f['travel_insurance_underwriter'] as string) ?? null,
+    const loungeFields: Array<keyof LoungePerks> = ['visits', 'access', 'condition', 'network'];
+    const loungeRaw: LoungePerks = {
+      visits: blank(f.lounge_visits),
+      access: blank(f.lounge_access),
+      condition: blank(f.lounge_condition),
+      network: blank(f.lounge_network),
     };
+    const lounge = loungeFields.some(k => loungeRaw[k]) ? loungeRaw : null;
 
-    /* note: overseas is stored as "overseas+" in some Airtable bases */
-    perks.overseas      = ((f['overseas'] || f['overseas+']) as string | null) ?? null;
-    perks.miles         = (f['miles']          as string | null) ?? null;
-    perks.transfer      = (f['transfer']       as string | null) ?? null;
-    perks.fasttrack     = (f['fasttrack']      as string | null) ?? null;
-    perks.hotel         = (f['hotel']          as string | null) ?? null;
-    perks.golf          = (f['golf']           as string | null) ?? null;
-    perks.concierge     = (f['concierge']      as string | null) ?? null;
-    perks.roaming       = (f['roaming']        as string | null) ?? null;
-    perks.businessclass = (f['businessclass']  as string | null) ?? null;
-    perks.wifi          = (f['wifi']           as string | null) ?? null;
-    perks.protection    = (f['protection']     as string | null) ?? null;
+    // the underwriter link only makes sense alongside an underwriter name — ignore a
+    // stray URL (seen in the data) when the name itself is blank
+    const insuranceUnderwriter = blank(f.travel_insurance_underwriter);
+    const insuranceRaw: InsurancePerks = {
+      disruptions: blank(f.travel_insurance_disruptions),
+      medical: blank(f.travel_insurance_medical),
+      accident: blank(f.travel_insurance_accident),
+      condition: blank(f.travel_insurance_condition),
+      underwriter: insuranceUnderwriter,
+      underwriterUrl: insuranceUnderwriter ? blank(f.travel_insurance_underwriter_url) : null,
+    };
+    const insurance = [
+      insuranceRaw.disruptions, insuranceRaw.medical, insuranceRaw.accident,
+      insuranceRaw.condition, insuranceRaw.underwriter,
+    ].some(Boolean) ? insuranceRaw : null;
+
+    const curtailUnderwriter = blank(f.curtail_underwriter);
+    const curtailRaw: CurtailPerks = {
+      flightDelay: blank(f.curtail_flight_delay),
+      flightCancellation: blank(f.curtail_flight_cancellation),
+      baggageDelay: blank(f.curtail_baggage_delay),
+      condition: blank(f.curtail_condition),
+      underwriter: curtailUnderwriter,
+      underwriterUrl: curtailUnderwriter ? blank(f.curtail_underwriter_url) : null,
+    };
+    const curtail = [
+      curtailRaw.flightDelay, curtailRaw.flightCancellation, curtailRaw.baggageDelay,
+      curtailRaw.condition, curtailRaw.underwriter,
+    ].some(Boolean) ? curtailRaw : null;
+
+    const invitationOnly = Boolean(f.invitation_only);
+    const rawMinIncome = blankNum(f.min_income);
+    // Required invariant: invitation_only ⇒ min_income blank. Flag violations instead of crashing.
+    const invitationIncomeConflict = invitationOnly && rawMinIncome != null;
+    const minIncome = invitationOnly ? null : rawMinIncome;
+
+    const annualFeeDetails = (blank(f.annual_fee_details) ?? '')
+      .split('\n')
+      .map(s => s.trim())
+      .filter(Boolean);
 
     return {
-      id:                 String(f.card_id   ?? r.id),
-      card_name:          String(f.card_name ?? ''),
-      tier:               String(f.tier      ?? ''),
-      net:                String(f.net       ?? ''),
-      num:                String(f.num       ?? ''),
-      theme:              String(f.theme     ?? ''),
-      fg:                 String(f.fg        ?? ''),
-      min_income:         Number(f.min_income ?? 0),
-      annual_fee:         Number(f.annual_fee ?? 0),
-      annual_fee_details: String(f.annual_fee_details ?? ''),
-      perks,
+      id: String(f.card_id ?? r.id),
+      card_name: String(f.card_name ?? ''),
+      bank: String(f.bank ?? ''),
+      tier: String(f.tier ?? ''),
+      net: String(f.net ?? ''),
+      ui_card_background: String(f.ui_card_background ?? ''),
+      ui_card_text_color: String(f.ui_card_text_color ?? ''),
+      min_income: minIncome,
+      invitation_only: invitationOnly,
+      invitationIncomeConflict,
+      annual_fee: blankNum(f.annual_fee),
+      annual_fee_details: annualFeeDetails,
+      apply_url: blank(f.apply_url) ?? '#',
+      lounge,
+      insurance,
+      spending_rewards_cashback: blank(f.spending_rewards_cashback),
+      spending_rewards_details: blank(f.spending_rewards_details),
+      fx_fee_pct: blank(f.fx_fee_pct),
+      fx_provider: blank(f.fx_provider),
+      curtail,
+      vas_list: parseVasList(blank(f.vas_list)),
     };
   });
 }
 
 export function transformLounges(records: AirtableRecord[]): Lounge[] {
   return records.map(r => {
-    const f = r.fields as Record<string, unknown>;
+    const f = r.fields;
     return {
-      id:           String(f.lounge_id    ?? r.id),
+      id: String(f.lounge_id ?? r.id),
       airport_code: String(f.airport_code ?? ''),
-      city:         String(f.city         ?? ''),
-      lounge_name:  String(f.lounge_name  ?? ''),
-      location:     String(f.location     ?? ''),
-      airport:      String(f.airport      ?? ''),
-      country:      String(f.country      ?? ''),
-      net:          String(f.net          ?? ''),
-      region:       String(f.region       ?? ''),
-      lon:          parseFloat(String(f.lon ?? '')),
-      lat:          parseFloat(String(f.lat ?? '')),
-      amen:         String(f.amen ?? '').split('|').map(s => s.trim()).filter(Boolean),
+      city: String(f.city ?? ''),
+      country: String(f.country ?? ''),
+      airport: String(f.airport ?? ''),
+      lounge_name: String(f.lounge_name ?? ''),
+      location: String(f.location ?? ''),
+      terminal: blank(f.terminal),
+      opening_hours: blank(f.opening_hours),
+      region: String(f.region ?? ''),
+      lon: parseFloat(String(f.lon ?? '')),
+      lat: parseFloat(String(f.lat ?? '')),
       /* not an Airtable field — populated from the LoungebyCard join in store.loadData */
-      cards:        [],
+      cards: [],
     };
   });
 }
@@ -121,8 +150,8 @@ export interface LoungeAccess {
 export function transformLoungeAccess(records: AirtableRecord[]): LoungeAccess[] {
   return records
     .map(r => ({
-      cardId:      String(r.fields.card_id     ?? ''),
-      loungeId:    String(r.fields.lounge_id   ?? ''),
+      cardId: String(r.fields.card_id ?? ''),
+      loungeId: String(r.fields.lounge_id ?? ''),
       entitlement: String(r.fields.entitlement ?? ''),
     }))
     .filter(a => a.cardId && a.loungeId);

@@ -1,9 +1,5 @@
-import CardList from '@/components/CardList';
+import CardExplorer from '@/components/CardExplorer';
 
 export default function CardsPage() {
-  return (
-    <div className="page">
-      <CardList />
-    </div>
-  );
+  return <CardExplorer />;
 }
