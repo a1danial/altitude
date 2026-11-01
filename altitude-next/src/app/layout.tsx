@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Nav from "@/components/Nav";
-import StickyBar from "@/components/StickyBar";
 import DataProvider from "@/components/DataProvider";
+import OpeningDirectoryModal from "@/components/OpeningDirectoryModal";
+import BottomNav from "@/components/BottomNav";
 
 export const metadata: Metadata = {
   title: "ALTITUDE — Premier Travel Cards",
@@ -26,14 +26,14 @@ export default function RootLayout({
       </head>
       <body>
         <DataProvider />
-        <Nav />
         <main className="wrap" id="view">{children}</main>
         <footer className="site">
           <div className="wrap">
             <p>ALTITUDE · A curated concierge for premium travel cards · Illustrative product data for demonstration</p>
           </div>
         </footer>
-        <StickyBar />
+        <OpeningDirectoryModal />
+        <BottomNav />
       </body>
     </html>
   );
