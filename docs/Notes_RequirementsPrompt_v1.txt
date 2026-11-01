@@ -4,7 +4,7 @@ OPENING DIALOG
 
 CARD EXPLORER
 - Page
--- Default cards: 3 only
+-- Default cards: 5 only
 - Cell value
 -- Empty data handling: Show greyed "Not offered"
 --- Data value required
